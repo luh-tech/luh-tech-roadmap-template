@@ -2,7 +2,7 @@
 
 > JSON-first documentation system for LuhTech portfolio ventures
 
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **Last Updated:** December 9, 2025
 
 ## Overview
@@ -62,9 +62,26 @@ cp path/to/luh-tech-roadmap-template/.github/workflows/roadmap-sync.yml .github/
 
 ## Schemas
 
+### Roadmap Schema Versions
+
+| Schema | Version | Purpose | Recommended |
+|--------|---------|---------|-------------|
+| `roadmap.schema.v2.json` | 2.0 | Full venture roadmap with meta, advanced features | ✅ **Use this** |
+| `roadmap.schema.json` | 1.0 | Simplified roadmap (backwards compatible) | Legacy |
+
+**Use v2 for new ventures.** The v2 schema matches the battle-tested format used across 6 existing venture roadmaps with support for:
+- `meta` block (ventureId, ventureName, author, lastUpdated)
+- `venture.platformProgress` and `currentPhase`
+- `quarter.theme` for longer descriptions
+- `advancedFeatures` (AR, robotics roadmaps)
+- `competitive` positioning (competitors, moats)
+
+### All Schemas
+
 | Schema | Purpose | Required |
 |--------|---------|----------|
-| `roadmap.schema.json` | 18-month venture roadmap | Yes |
+| `roadmap.schema.v2.json` | 18-month venture roadmap (recommended) | Yes |
+| `roadmap.schema.json` | Legacy roadmap format | No (v1 compat) |
 | `venture-summary.schema.json` | Investor-ready pitch data | Yes |
 | `decision-log.schema.json` | Decision tracking | Yes |
 | `dependencies.schema.json` | Cross-venture dependencies | Yes |
