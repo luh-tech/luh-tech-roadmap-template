@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/dependencies-v1.json",
+  "title": "Venture Dependencies",
+  "description": "Cross-venture dependency tracking for portfolio-wide coordination and conflict detection.",
+  "type": "object",
+  "required": ["$schema", "version", "ventureId", "dependencies"],
+  "properties": {
+    "$schema": {"type": "string", "const": "https://luhtech.dev/schemas/dependencies-v1.json"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "ventureId": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+    "lastUpdated": {"type": "string", "format": "date-time"},
+    "dependencies": {"type": "array", "items": {"$ref": "#/definitions/dependency"}},
+    "provides": {"type": "array", "items": {"$ref": "#/definitions/provision"}},
+    "templates": {"type": "array", "items": {"$ref": "#/definitions/templateDependency"}},
+    "sharedResources": {"type": "array", "items": {"$ref": "#/definitions/sharedResource"}}
+  },
+  "definitions": {
+    "dependency": {
+      "type": "object",
+      "required": ["id", "type", "status"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^dep-[a-z0-9-]+$"},
+        "type": {"type": "string", "enum": ["venture", "template", "infrastructure", "api", "data", "team", "external"]},
+        "targetVentureId": {"type": ["string", "null"]},
+        "targetMilestone": {"type": ["string", "null"]},
+        "description": {"type": "string"},
+        "blocking": {"type": "boolean", "default": false},
+        "status": {"type": "string", "enum": ["pending", "in-progress", "satisfied", "at-risk", "blocked"]},
+        "requiredBy": {"type": ["string", "null"], "format": "date"},
+        "satisfiedOn": {"type": ["string", "null"], "format": "date"},
+        "quarter": {"type": ["string", "null"], "pattern": "^q[1-4]_20[0-9]{2}$"},
+        "impact": {"type": "string", "enum": ["critical", "high", "medium", "low"]},
+        "notes": {"type": "string"}
+      }
+    },
+    "provision": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^prov-[a-z0-9-]+$"},
+        "type": {"type": "string", "enum": ["template", "api", "infrastructure", "data", "library"]},
+        "description": {"type": "string"},
+        "consumedBy": {"type": "array", "items": {"type": "string"}},
+        "availableFrom": {"type": ["string", "null"], "format": "date"},
+        "status": {"type": "string", "enum": ["planned", "in-development", "available", "deprecated"]}
+      }
+    },
+    "templateDependency": {
+      "type": "object",
+      "required": ["templateId", "version"],
+      "properties": {
+        "templateId": {"type": "string"},
+        "version": {"type": "string"},
+        "status": {"type": "string", "enum": ["waiting", "applied", "customized"]},
+        "appliedOn": {"type": ["string", "null"], "format": "date"},
+        "customizations": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "sharedResource": {
+      "type": "object",
+      "required": ["resourceId", "type"],
+      "properties": {
+        "resourceId": {"type": "string"},
+        "type": {"type": "string", "enum": ["database", "api-gateway", "auth-service", "storage", "cdn", "ci-cd"]},
+        "owner": {"type": "string"},
+        "accessLevel": {"type": "string", "enum": ["read", "write", "admin"]},
+        "sharedWith": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}
