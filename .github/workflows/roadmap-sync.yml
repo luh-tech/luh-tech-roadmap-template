@@ -1,0 +1,82 @@
+name: Roadmap Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.roadmap/**'
+      - 'schemas/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.roadmap/**'
+      - 'schemas/**'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate Roadmap Files
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli ajv-formats
+      
+      - name: Validate roadmap.json
+        if: hashFiles('.roadmap/roadmap.json') != ''
+        run: |
+          ajv validate -s schemas/roadmap.schema.json -d .roadmap/roadmap.json --spec=draft7 -c ajv-formats
+      
+      - name: Validate venture-summary.json
+        if: hashFiles('.roadmap/venture-summary.json') != ''
+        run: |
+          ajv validate -s schemas/venture-summary.schema.json -d .roadmap/venture-summary.json --spec=draft7 -c ajv-formats
+      
+      - name: Validate decision-log.json
+        if: hashFiles('.roadmap/decision-log.json') != ''
+        run: |
+          ajv validate -s schemas/decision-log.schema.json -d .roadmap/decision-log.json --spec=draft7 -c ajv-formats
+      
+      - name: Validate dependencies.json
+        if: hashFiles('.roadmap/dependencies.json') != ''
+        run: |
+          ajv validate -s schemas/dependencies.schema.json -d .roadmap/dependencies.json --spec=draft7 -c ajv-formats
+      
+      - name: Validate boundaries.json
+        if: hashFiles('.roadmap/boundaries.json') != ''
+        run: |
+          ajv validate -s schemas/boundaries.schema.json -d .roadmap/boundaries.json --spec=draft7 -c ajv-formats
+      
+      - name: Validate examples
+        run: |
+          for example in examples/*.json; do
+            if [ -f "$example" ]; then
+              filename=$(basename "$example")
+              schema_name="${filename%.json}.schema.json"
+              if [ -f "schemas/$schema_name" ]; then
+                echo "Validating $example against schemas/$schema_name"
+                ajv validate -s "schemas/$schema_name" -d "$example" --spec=draft7 -c ajv-formats
+              else
+                echo "No schema found for $example, skipping"
+              fi
+            fi
+          done
+
+  notify:
+    name: Notify Aggregator
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Trigger roadmap-aggregator sync
+        run: |
+          echo "Roadmap validated successfully"
+          echo "TODO: Add webhook to notify roadmap-aggregator when implemented"
