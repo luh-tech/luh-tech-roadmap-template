@@ -2,9 +2,9 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://luhtech.dev/schemas/roadmap-v2.json",
   "title": "LuhTech Venture Roadmap v2",
-  "description": "JSON-first roadmap schema for LuhTech portfolio ventures. Supports full venture metadata, quarterly planning, financials, team planning, and advanced features tracking.",
+  "description": "JSON-first roadmap schema for LuhTech portfolio ventures. Supports full venture metadata, quarterly planning, financials, team planning, and advanced features tracking. v2.1.0 adds compound type support and relaxed requirements for summary files.",
   "type": "object",
-  "required": ["$schema", "schemaVersion", "meta", "venture", "pitch", "quarters"],
+  "required": ["$schema", "schemaVersion", "meta", "venture", "pitch"],
   "properties": {
     "$schema": {
       "type": "string",
@@ -27,7 +27,7 @@
     },
     "quarters": {
       "type": "object",
-      "description": "Quarterly roadmap data keyed by quarter ID (e.g., 'q4_2025')",
+      "description": "Quarterly roadmap data keyed by quarter ID (e.g., 'q4_2025'). Optional for summary files.",
       "patternProperties": {
         "^q[1-4]_20[0-9]{2}$": {
           "$ref": "#/definitions/quarter"
@@ -56,6 +56,10 @@
     },
     "competitive": {
       "$ref": "#/definitions/competitive"
+    },
+    "_note": {
+      "type": "string",
+      "description": "Reference to full roadmap location (for summary files)"
     }
   },
   "definitions": {
@@ -85,12 +89,16 @@
         },
         "status": {
           "type": "string",
-          "enum": ["active", "paused", "archived", "draft"],
+          "enum": ["active", "paused", "archived", "draft", "r&d", "planning", "pilot"],
           "description": "Document status"
         },
         "sourceDoc": {
           "type": "string",
           "description": "Reference to source document or Google Doc"
+        },
+        "formerName": {
+          "type": "string",
+          "description": "Previous name of venture (for renamed ventures)"
         }
       }
     },
@@ -100,13 +108,25 @@
       "required": ["type", "architecture"],
       "properties": {
         "type": {
-          "type": "string",
-          "enum": ["Platform", "Hardware", "SaaS", "API", "Marketplace"],
-          "description": "Venture category"
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Single venture type or compound type (e.g., 'Hardware + SaaS')"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "description": "Array of venture type tags"
+            }
+          ],
+          "description": "Venture category - single value, compound string, or array of tags"
         },
         "architecture": {
           "type": "string",
-          "enum": ["Cloud-First", "Edge-First", "Hybrid", "API-Only", "Platform"],
+          "enum": ["Cloud-First", "Edge-First", "Hybrid", "API-Only", "Platform", "Edge + Cloud"],
           "description": "Primary architecture pattern"
         },
         "forkParent": {
@@ -136,18 +156,26 @@
           "type": "string",
           "format": "uri",
           "description": "GitHub repository URL"
+        },
+        "patent": {
+          "type": "string",
+          "description": "Patent number (if applicable)"
+        },
+        "patentTitle": {
+          "type": "string",
+          "description": "Patent title (if applicable)"
         }
       }
     },
     "pitch": {
       "type": "object",
       "description": "Investor pitch content",
-      "required": ["oneLiner", "problem", "solution", "market", "differentiator", "businessModel"],
+      "required": ["oneLiner", "problem", "solution", "market", "differentiator"],
       "properties": {
         "oneLiner": {
           "type": "string",
-          "maxLength": 150,
-          "description": "Elevator pitch (60-100 chars ideal)"
+          "maxLength": 200,
+          "description": "Elevator pitch (60-150 chars ideal)"
         },
         "problem": {
           "type": "string",
@@ -558,6 +586,11 @@
           "type": "boolean",
           "default": false,
           "description": "Is this a gate?"
+        },
+        "critical": {
+          "type": "boolean",
+          "default": false,
+          "description": "Is this critical path?"
         },
         "dependsOn": {
           "type": "array",
