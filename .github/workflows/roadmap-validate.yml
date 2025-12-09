@@ -1,0 +1,146 @@
+name: Roadmap Validation (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      venture-id:
+        description: 'Venture identifier (e.g., hilja, ectropy, raizal)'
+        required: true
+        type: string
+      schema-version:
+        description: 'Schema version to validate against'
+        required: false
+        type: string
+        default: 'v2'
+      fail-on-warning:
+        description: 'Whether warnings should fail the build'
+        required: false
+        type: boolean
+        default: false
+      generate-report:
+        description: 'Generate detailed validation report'
+        required: false
+        type: boolean
+        default: true
+    outputs:
+      validation-result:
+        description: 'Validation result (pass/fail)'
+        value: ${{ jobs.validate.outputs.result }}
+      files-validated:
+        description: 'Number of files validated'
+        value: ${{ jobs.validate.outputs.file-count }}
+
+jobs:
+  validate:
+    name: Validate Roadmap Files
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.summary.outputs.result }}
+      file-count: ${{ steps.summary.outputs.file-count }}
+    
+    steps:
+      - name: Checkout Venture Repository
+        uses: actions/checkout@v4
+        with:
+          path: venture
+
+      - name: Checkout Schema Repository
+        uses: actions/checkout@v4
+        with:
+          repository: luh-tech/luh-tech-roadmap-template
+          path: template
+          sparse-checkout: |
+            schemas/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Validation Tools
+        run: npm install -g ajv-cli ajv-formats
+
+      - name: Validate Roadmap Files
+        id: validate-files
+        run: |
+          echo "🔍 Validating .roadmap/ for venture: ${{ inputs.venture-id }}"
+          
+          SCHEMA_DIR="template/schemas"
+          ROADMAP_DIR="venture/.roadmap"
+          PASSED=0
+          FAILED=0
+          
+          if [ ! -d "$ROADMAP_DIR" ]; then
+            echo "::error::.roadmap/ directory not found"
+            exit 1
+          fi
+          
+          # roadmap.json (REQUIRED)
+          if [ -f "$ROADMAP_DIR/roadmap.json" ]; then
+            if ajv validate -s "$SCHEMA_DIR/roadmap.schema.${{ inputs.schema-version }}.json" -d "$ROADMAP_DIR/roadmap.json" --spec=draft7 -c ajv-formats 2>/dev/null; then
+              echo "✅ roadmap.json"; PASSED=$((PASSED + 1))
+            else
+              echo "❌ roadmap.json"; FAILED=$((FAILED + 1))
+            fi
+          else
+            echo "::error::roadmap.json required"; FAILED=$((FAILED + 1))
+          fi
+          
+          # venture-summary.json (REQUIRED)
+          if [ -f "$ROADMAP_DIR/venture-summary.json" ]; then
+            if ajv validate -s "$SCHEMA_DIR/venture-summary.schema.json" -d "$ROADMAP_DIR/venture-summary.json" --spec=draft7 -c ajv-formats 2>/dev/null; then
+              echo "✅ venture-summary.json"; PASSED=$((PASSED + 1))
+            else
+              echo "❌ venture-summary.json"; FAILED=$((FAILED + 1))
+            fi
+          else
+            echo "::error::venture-summary.json required"; FAILED=$((FAILED + 1))
+          fi
+          
+          # decision-log.json (OPTIONAL)
+          if [ -f "$ROADMAP_DIR/decision-log.json" ]; then
+            if ajv validate -s "$SCHEMA_DIR/decision-log.schema.json" -d "$ROADMAP_DIR/decision-log.json" --spec=draft7 -c ajv-formats 2>/dev/null; then
+              echo "✅ decision-log.json"; PASSED=$((PASSED + 1))
+            else
+              echo "❌ decision-log.json"; FAILED=$((FAILED + 1))
+            fi
+          fi
+          
+          # dependencies.json (OPTIONAL)
+          if [ -f "$ROADMAP_DIR/dependencies.json" ]; then
+            if ajv validate -s "$SCHEMA_DIR/dependencies.schema.json" -d "$ROADMAP_DIR/dependencies.json" --spec=draft7 -c ajv-formats 2>/dev/null; then
+              echo "✅ dependencies.json"; PASSED=$((PASSED + 1))
+            else
+              echo "❌ dependencies.json"; FAILED=$((FAILED + 1))
+            fi
+          fi
+          
+          # boundaries.json (OPTIONAL)
+          if [ -f "$ROADMAP_DIR/boundaries.json" ]; then
+            if ajv validate -s "$SCHEMA_DIR/boundaries.schema.json" -d "$ROADMAP_DIR/boundaries.json" --spec=draft7 -c ajv-formats 2>/dev/null; then
+              echo "✅ boundaries.json"; PASSED=$((PASSED + 1))
+            else
+              echo "❌ boundaries.json"; FAILED=$((FAILED + 1))
+            fi
+          fi
+          
+          echo "📊 Results: $PASSED passed, $FAILED failed"
+          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          
+          if [ $FAILED -gt 0 ]; then
+            echo "::error::Validation failed"
+            exit 1
+          fi
+
+      - name: Generate Summary
+        id: summary
+        if: always()
+        run: |
+          FAILED="${{ steps.validate-files.outputs.failed || '0' }}"
+          if [ "$FAILED" == "0" ]; then
+            echo "result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "result=fail" >> $GITHUB_OUTPUT
+          fi
+          echo "file-count=${{ steps.validate-files.outputs.passed || '0' }}" >> $GITHUB_OUTPUT
