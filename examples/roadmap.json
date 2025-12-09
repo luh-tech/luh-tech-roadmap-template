@@ -1,0 +1,72 @@
+{
+  "$schema": "https://luhtech.dev/schemas/roadmap-v1.json",
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-09T00:00:00Z",
+  "venture": {
+    "id": "example-venture",
+    "name": "Example Venture",
+    "type": "SaaS",
+    "architecture": "Cloud-First",
+    "status": "active",
+    "domain": "example.com",
+    "repository": "https://github.com/luh-tech/example-venture"
+  },
+  "pitch": {
+    "oneLiner": "One sentence that captures your value proposition",
+    "problem": "The pain point you solve - be specific and quantifiable",
+    "solution": "Your unique approach to solving the problem",
+    "market": "$XXB TAM growing at XX% CAGR, targeting [specific segment]",
+    "differentiator": "Why you win - technical moat, network effects, etc.",
+    "businessModel": "SaaS with tiered pricing: Starter ($X/mo), Pro ($X/mo), Enterprise (custom)",
+    "traction": "X customers, $X MRR, X% MoM growth",
+    "ask": "$XM to achieve [specific milestones]"
+  },
+  "quarters": {
+    "q4_2025": {
+      "focus": "Foundation & First Customers",
+      "milestones": [
+        {"date": "2025-12-15", "event": "MVP Launch", "gate": true, "type": "launch"},
+        {"date": "2025-12-31", "event": "First 5 Customers", "type": "business"}
+      ],
+      "deliverables": [
+        {"name": "Core Platform MVP", "owner": "team", "status": "in-progress", "priority": 1},
+        {"name": "Landing Page", "owner": "erik", "status": "complete", "priority": 2}
+      ],
+      "risks": [
+        {"risk": "MVP delays due to scope creep", "probability": "medium", "impact": "high", "mitigation": "Weekly scope reviews"}
+      ],
+      "erikHours": 30
+    },
+    "q1_2026": {
+      "focus": "Product-Market Fit Validation",
+      "milestones": [
+        {"date": "2026-02-15", "event": "20 Paying Customers", "type": "business"},
+        {"date": "2026-03-31", "event": "$5K MRR", "gate": true, "type": "business"}
+      ],
+      "erikHours": 25
+    }
+  },
+  "financials": {
+    "preSeed": "$500K",
+    "seed": "$2M",
+    "year1Revenue": "$100K",
+    "burnRate": "$15K/mo",
+    "runway": 12
+  },
+  "team": {
+    "current": 1,
+    "q2_2026_target": 3,
+    "keyHires": [
+      {"role": "Full-Stack Developer", "quarter": "q2_2026", "critical": true}
+    ]
+  },
+  "erikAllocation": {
+    "currentHoursPerWeek": 30,
+    "targetHoursPerWeek": 15,
+    "transitionQuarter": "q3_2026"
+  },
+  "keyMilestones": [
+    {"id": "mvp-launch", "date": "2025-12-15", "event": "MVP Launch", "gate": true},
+    {"id": "pmf-validation", "date": "2026-03-31", "event": "PMF Validation", "gate": true, "dependsOn": ["mvp-launch"]}
+  ]
+}
