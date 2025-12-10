@@ -1,0 +1,418 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/architecture-roadmap-v1.json",
+  "title": "LuhTech Architecture Roadmap v1",
+  "description": "Technical architecture roadmap schema for LuhTech portfolio ventures. Defines services, infrastructure, deployment phases, and cross-links to business roadmap. v1.0.0 establishes canonical pattern across all ventures.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "meta",
+    "businessRoadmapRef"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Schema identifier - MUST reference this canonical schema",
+      "enum": ["https://luhtech.dev/schemas/architecture-roadmap-v1.json"]
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "SemVer version of this architecture document"
+    },
+    "meta": {
+      "$ref": "#/definitions/meta"
+    },
+    "businessRoadmapRef": {
+      "$ref": "#/definitions/businessRoadmapRef"
+    },
+    "services": {
+      "type": "array",
+      "description": "Service specifications (optional for non-software ventures)",
+      "items": {
+        "$ref": "#/definitions/service"
+      }
+    },
+    "infrastructure": {
+      "$ref": "#/definitions/infrastructure"
+    },
+    "deployment": {
+      "$ref": "#/definitions/deployment"
+    },
+    "hardware": {
+      "$ref": "#/definitions/hardware"
+    },
+    "validation": {
+      "$ref": "#/definitions/validation"
+    },
+    "relatedDocuments": {
+      "$ref": "#/definitions/relatedDocuments"
+    }
+  },
+  "definitions": {
+    "meta": {
+      "type": "object",
+      "description": "Document metadata - MUST align with business roadmap meta",
+      "required": ["ventureId", "ventureName", "lastUpdated", "status"],
+      "properties": {
+        "ventureId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Venture identifier - MUST match business roadmap meta.ventureId"
+        },
+        "ventureName": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Display name - MUST match business roadmap meta.ventureName"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO-8601 timestamp of last update"
+        },
+        "author": {
+          "type": "string",
+          "description": "Person who last updated this document"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["planning", "approved", "in-progress", "complete", "deprecated"],
+          "description": "Architecture document status"
+        },
+        "purpose": {
+          "type": "string",
+          "description": "Purpose of this architecture document"
+        },
+        "currentPhase": {
+          "type": "string",
+          "description": "Current architecture phase (e.g., 'phase-5a', 'v1.0')"
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Target implementation date for current phase"
+        }
+      }
+    },
+    "businessRoadmapRef": {
+      "type": "object",
+      "description": "REQUIRED cross-reference to business roadmap - establishes the link",
+      "required": ["path", "ventureId"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Relative path to business roadmap.json"
+        },
+        "ventureId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Venture ID - MUST match meta.ventureId and business roadmap meta.ventureId"
+        },
+        "fullRoadmapPath": {
+          "type": "string",
+          "description": "Path to full business roadmap in business-tools (if summary file used)"
+        },
+        "milestoneAlignment": {
+          "type": "array",
+          "description": "Explicit mapping between architecture phases and business milestones",
+          "items": {
+            "type": "object",
+            "required": ["architecturePhase", "businessMilestoneId"],
+            "properties": {
+              "architecturePhase": {
+                "type": "string",
+                "description": "Architecture deployment phase"
+              },
+              "businessMilestoneId": {
+                "type": "string",
+                "description": "Business roadmap keyMilestone.id"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of alignment"
+              }
+            }
+          }
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "description": "Service specification",
+      "required": ["serviceId", "name", "description", "technology"],
+      "properties": {
+        "serviceId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Unique service identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable service name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Service purpose and responsibilities"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 65535,
+          "description": "Reserved port number"
+        },
+        "technology": {
+          "type": "string",
+          "description": "Primary technology stack"
+        },
+        "deliverableId": {
+          "type": "string",
+          "description": "Corresponding business roadmap deliverable ID"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Implementation priority"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Service dependencies"
+        },
+        "database": { "$ref": "#/definitions/databaseSpec" },
+        "apiEndpoints": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/apiEndpoint" }
+        },
+        "integrations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/integration" }
+        },
+        "estimatedHours": { "type": "integer", "minimum": 0 },
+        "startDate": { "type": "string", "format": "date" },
+        "targetDate": { "type": "string", "format": "date" }
+      }
+    },
+    "databaseSpec": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["postgresql", "mysql", "mongodb", "redis", "timescaledb", "sqlite"]
+        },
+        "tables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "purpose"],
+            "properties": {
+              "name": { "type": "string" },
+              "purpose": { "type": "string" },
+              "estimatedRows": { "type": "string" },
+              "keyColumns": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "migrations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "apiEndpoint": {
+      "type": "object",
+      "required": ["method", "path", "description"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "GraphQL", "WebSocket"]
+        },
+        "path": { "type": "string" },
+        "description": { "type": "string" },
+        "authentication": { "type": "boolean", "default": true }
+      }
+    },
+    "integration": {
+      "type": "object",
+      "required": ["service", "purpose"],
+      "properties": {
+        "service": { "type": "string" },
+        "purpose": { "type": "string" },
+        "apiKey": { "type": "boolean" },
+        "protocol": {
+          "type": "string",
+          "enum": ["REST", "GraphQL", "gRPC", "WebSocket", "MQTT", "Serial", "Modbus"]
+        }
+      }
+    },
+    "infrastructure": {
+      "type": "object",
+      "properties": {
+        "portAllocation": {
+          "type": "object",
+          "properties": {
+            "reserved": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["port", "service", "status"],
+                "properties": {
+                  "port": { "type": "integer" },
+                  "service": { "type": "string" },
+                  "status": { "type": "string", "enum": ["reserved", "active", "deprecated"] },
+                  "notes": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "docker": {
+          "type": "object",
+          "properties": {
+            "composeFile": { "type": "string" },
+            "services": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "image": { "type": "string" },
+                  "port": { "type": "integer" },
+                  "environment": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "nginx": {
+          "type": "object",
+          "properties": {
+            "configPath": { "type": "string" },
+            "routes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path", "upstream"],
+                "properties": {
+                  "path": { "type": "string" },
+                  "upstream": { "type": "string" },
+                  "port": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "cloud": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "enum": ["digitalocean", "aws", "gcp", "azure", "vercel", "railway", "self-hosted"]
+            },
+            "region": { "type": "string" },
+            "services": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": ["rolling", "blue-green", "canary", "manual"]
+        },
+        "phases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["phaseId", "name"],
+            "properties": {
+              "phaseId": { "type": "string" },
+              "phaseNumber": { "type": "number" },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "services": { "type": "array", "items": { "type": "string" } },
+              "businessMilestoneRef": { "type": "string" },
+              "estimatedDuration": { "type": "string" },
+              "targetDate": { "type": "string", "format": "date" },
+              "status": { "type": "string", "enum": ["planned", "in-progress", "completed", "blocked"] },
+              "deliverables": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["description", "mitigation"],
+            "properties": {
+              "description": { "type": "string" },
+              "mitigation": { "type": "string" },
+              "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] }
+            }
+          }
+        }
+      }
+    },
+    "hardware": {
+      "type": "object",
+      "description": "Hardware specifications (for Hardware + SaaS ventures)",
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["componentId", "name", "type"],
+            "properties": {
+              "componentId": { "type": "string" },
+              "name": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["microcontroller", "sensor", "actuator", "display", "power", "communication", "enclosure", "mechanical"]
+              },
+              "specifications": { "type": "object", "additionalProperties": true },
+              "supplier": { "type": "string" },
+              "unitCost": { "type": "string" }
+            }
+          }
+        },
+        "protocols": { "type": "array", "items": { "type": "string" } },
+        "firmware": {
+          "type": "object",
+          "properties": {
+            "platform": { "type": "string" },
+            "repository": { "type": "string" },
+            "version": { "type": "string" }
+          }
+        },
+        "manufacturing": {
+          "type": "object",
+          "properties": {
+            "bom": { "type": "string" },
+            "assemblyInstructions": { "type": "string" },
+            "certifications": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "portConflicts": { "type": "boolean" },
+        "dependenciesResolved": { "type": "boolean" },
+        "schemaValid": { "type": "boolean" },
+        "businessRoadmapLinked": { "type": "boolean" },
+        "lastValidated": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" }
+      }
+    },
+    "relatedDocuments": {
+      "type": "object",
+      "properties": {
+        "businessRoadmap": { "type": "string" },
+        "technicalDocs": { "type": "array", "items": { "type": "string" } },
+        "adrDirectory": { "type": "string" }
+      },
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}
