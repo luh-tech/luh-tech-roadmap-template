@@ -1,0 +1,360 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/definitions.json",
+  "title": "LuhTech Shared Definitions",
+  "description": "Reusable schema definitions for common patterns across all LuhTech schemas.",
+  "definitions": {
+    "contact": {
+      "type": "object",
+      "description": "Contact information for a person",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number"
+        },
+        "linkedin": {
+          "type": "string",
+          "format": "uri",
+          "description": "LinkedIn profile URL"
+        },
+        "github": {
+          "type": "string",
+          "format": "uri",
+          "description": "GitHub profile URL"
+        },
+        "twitter": {
+          "type": "string",
+          "description": "Twitter/X handle"
+        },
+        "website": {
+          "type": "string",
+          "format": "uri",
+          "description": "Personal website"
+        },
+        "address": {
+          "$ref": "#/definitions/address"
+        }
+      }
+    },
+
+    "address": {
+      "type": "object",
+      "description": "Physical address",
+      "properties": {
+        "street": {"type": "string"},
+        "city": {"type": "string"},
+        "state": {"type": "string"},
+        "postalCode": {"type": "string"},
+        "country": {"type": "string"}
+      }
+    },
+
+    "dateRange": {
+      "type": "object",
+      "description": "Date range with start and optional end",
+      "required": ["start"],
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date",
+          "description": "Start date"
+        },
+        "end": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "End date (null for ongoing)"
+        }
+      }
+    },
+
+    "dateTimeRange": {
+      "type": "object",
+      "description": "DateTime range with timestamps",
+      "required": ["start"],
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+
+    "quarterRange": {
+      "type": "object",
+      "description": "Quarter range for planning",
+      "properties": {
+        "start": {
+          "type": "string",
+          "pattern": "^q[1-4]_20[0-9]{2}$"
+        },
+        "end": {
+          "type": "string",
+          "pattern": "^q[1-4]_20[0-9]{2}$"
+        }
+      }
+    },
+
+    "reference": {
+      "type": "object",
+      "description": "Cross-schema reference",
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["venture", "milestone", "dependency", "relationship", "ip-asset", "service"],
+          "description": "Reference target type"
+        },
+        "id": {
+          "type": "string",
+          "description": "Target identifier"
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "Target schema $id"
+        },
+        "path": {
+          "type": "string",
+          "description": "Path to source file"
+        }
+      }
+    },
+
+    "money": {
+      "type": "object",
+      "description": "Monetary amount with currency",
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "description": "Numeric amount"
+        },
+        "currency": {
+          "type": "string",
+          "default": "USD",
+          "description": "ISO 4217 currency code"
+        },
+        "display": {
+          "type": "string",
+          "description": "Formatted display string (e.g., '$500K')"
+        }
+      }
+    },
+
+    "percentage": {
+      "type": "object",
+      "description": "Percentage value",
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "display": {
+          "type": "string",
+          "description": "Formatted display (e.g., '45%')"
+        }
+      }
+    },
+
+    "auditInfo": {
+      "type": "object",
+      "description": "Audit trail information",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+
+    "link": {
+      "type": "object",
+      "description": "External link with metadata",
+      "required": ["url"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["document", "repository", "website", "video", "presentation", "spreadsheet", "other"]
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+
+    "tag": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Lowercase hyphenated tag"
+    },
+
+    "tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/tag"
+      },
+      "uniqueItems": true
+    },
+
+    "person": {
+      "type": "object",
+      "description": "Person record",
+      "required": ["name"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string",
+          "format": "uri"
+        },
+        "contact": {
+          "$ref": "#/definitions/contact"
+        }
+      }
+    },
+
+    "organization": {
+      "type": "object",
+      "description": "Organization record",
+      "required": ["name"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["company", "investor", "accelerator", "university", "government", "nonprofit", "other"]
+        },
+        "website": {
+          "type": "string",
+          "format": "uri"
+        },
+        "logo": {
+          "type": "string",
+          "format": "uri"
+        },
+        "industry": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "location": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string"
+        },
+        "contact": {
+          "$ref": "#/definitions/contact"
+        }
+      }
+    },
+
+    "metric": {
+      "type": "object",
+      "description": "Business metric",
+      "required": ["name", "value"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "number"}
+          ]
+        },
+        "unit": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string"
+        },
+        "trend": {
+          "type": "string",
+          "enum": ["up", "down", "flat"]
+        },
+        "target": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "number"}
+          ]
+        },
+        "asOf": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+
+    "note": {
+      "type": "object",
+      "description": "Timestamped note",
+      "required": ["content", "date"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "author": {
+          "type": "string"
+        },
+        "tags": {
+          "$ref": "#/definitions/tags"
+        }
+      }
+    }
+  }
+}
