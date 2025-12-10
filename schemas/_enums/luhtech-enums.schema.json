@@ -1,0 +1,376 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/enums.json",
+  "title": "LuhTech Shared Enumerations",
+  "description": "Centralized enumeration definitions for all LuhTech portfolio schemas. Single source of truth for consistent validation across all ventures.",
+  "definitions": {
+    "_metadata": {
+      "type": "object",
+      "description": "Schema metadata - not for validation",
+      "properties": {
+        "version": {"const": "1.0.0"},
+        "lastUpdated": {"const": "2025-12-10"},
+        "maintainer": {"const": "LuhTech Enterprise Infrastructure"}
+      }
+    },
+
+    "ventureId": {
+      "type": "string",
+      "description": "Canonical venture identifiers across the LuhTech portfolio",
+      "enum": [
+        "ectropy",
+        "jobsitecontrol",
+        "hilja",
+        "qullqa",
+        "viiva",
+        "raizal",
+        "replique",
+        "luhtech"
+      ]
+    },
+
+    "portfolioLayer": {
+      "type": "string",
+      "description": "Portfolio strategic layer classification",
+      "enum": [
+        "flagship",
+        "base-triad",
+        "extension",
+        "vendor",
+        "independent",
+        "holding"
+      ]
+    },
+
+    "documentStatus": {
+      "type": "string",
+      "description": "Document/roadmap lifecycle status",
+      "enum": [
+        "active",
+        "paused",
+        "archived",
+        "draft",
+        "r&d",
+        "planning",
+        "pilot"
+      ]
+    },
+
+    "ventureStage": {
+      "type": "string",
+      "description": "Venture development/funding stage",
+      "enum": [
+        "concept",
+        "poc",
+        "pre-seed",
+        "seed",
+        "series-a",
+        "growth"
+      ]
+    },
+
+    "ventureType": {
+      "type": "string",
+      "description": "Primary venture business type",
+      "enum": [
+        "Platform",
+        "Hardware",
+        "SaaS",
+        "API",
+        "Marketplace",
+        "Holding"
+      ]
+    },
+
+    "architecture": {
+      "type": "string",
+      "description": "Technical architecture pattern",
+      "enum": [
+        "Cloud-First",
+        "Edge-First",
+        "Hybrid",
+        "API-Only",
+        "Platform",
+        "Edge + Cloud"
+      ]
+    },
+
+    "milestoneType": {
+      "type": "string",
+      "description": "Milestone category classification",
+      "enum": [
+        "technical",
+        "business",
+        "funding",
+        "team",
+        "launch",
+        "ar-milestone",
+        "partnership",
+        "ip"
+      ]
+    },
+
+    "milestoneStatus": {
+      "type": "string",
+      "description": "Timeline milestone completion status",
+      "enum": [
+        "complete",
+        "current",
+        "planned"
+      ]
+    },
+
+    "deliverableStatus": {
+      "type": "string",
+      "description": "Deliverable/work item status",
+      "enum": [
+        "planned",
+        "in-progress",
+        "complete",
+        "blocked",
+        "deferred"
+      ]
+    },
+
+    "featureStatus": {
+      "type": "string",
+      "description": "Feature development lifecycle status",
+      "enum": [
+        "planned",
+        "poc",
+        "mvp",
+        "beta",
+        "commercial",
+        "deprecated"
+      ]
+    },
+
+    "dependencyDirection": {
+      "type": "string",
+      "description": "Dependency relationship direction (roadmap context)",
+      "enum": [
+        "upstream",
+        "downstream",
+        "cross-venture",
+        "internal",
+        "external"
+      ]
+    },
+
+    "dependencyType": {
+      "type": "string",
+      "description": "Dependency category type (dependencies schema)",
+      "enum": [
+        "venture",
+        "template",
+        "infrastructure",
+        "api",
+        "data",
+        "team",
+        "external"
+      ]
+    },
+
+    "dependencyStatus": {
+      "type": "string",
+      "description": "Dependency resolution status",
+      "enum": [
+        "pending",
+        "in-progress",
+        "satisfied",
+        "at-risk",
+        "blocked"
+      ]
+    },
+
+    "impactLevel": {
+      "type": "string",
+      "description": "Impact or severity level",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+
+    "riskLevel": {
+      "type": "string",
+      "description": "Risk probability or impact assessment",
+      "enum": [
+        "low",
+        "medium",
+        "medium-high",
+        "high",
+        "critical"
+      ]
+    },
+
+    "provisionType": {
+      "type": "string",
+      "description": "Provision/capability type offered",
+      "enum": [
+        "template",
+        "api",
+        "infrastructure",
+        "data",
+        "library"
+      ]
+    },
+
+    "provisionStatus": {
+      "type": "string",
+      "description": "Provision availability status",
+      "enum": [
+        "planned",
+        "in-development",
+        "available",
+        "deprecated"
+      ]
+    },
+
+    "templateStatus": {
+      "type": "string",
+      "description": "Template application status",
+      "enum": [
+        "waiting",
+        "applied",
+        "customized"
+      ]
+    },
+
+    "sharedResourceType": {
+      "type": "string",
+      "description": "Shared infrastructure resource type",
+      "enum": [
+        "database",
+        "api-gateway",
+        "auth-service",
+        "storage",
+        "cdn",
+        "ci-cd"
+      ]
+    },
+
+    "accessLevel": {
+      "type": "string",
+      "description": "Resource access permission level",
+      "enum": [
+        "read",
+        "write",
+        "admin"
+      ]
+    },
+
+    "fundingStatus": {
+      "type": "string",
+      "description": "Funding round status",
+      "enum": [
+        "planning",
+        "raising",
+        "closing",
+        "closed"
+      ]
+    },
+
+    "trend": {
+      "type": "string",
+      "description": "Metric trend direction",
+      "enum": [
+        "up",
+        "down",
+        "flat"
+      ]
+    },
+
+    "relationshipType": {
+      "type": "string",
+      "description": "Stakeholder relationship category",
+      "enum": [
+        "investor",
+        "partner",
+        "customer",
+        "advisor",
+        "founder-candidate",
+        "vendor",
+        "accelerator",
+        "employee"
+      ]
+    },
+
+    "pipelineStage": {
+      "type": "string",
+      "description": "Dealflow/pipeline stage",
+      "enum": [
+        "prospect",
+        "contacted",
+        "meeting",
+        "due-diligence",
+        "term-sheet",
+        "closed-won",
+        "closed-lost",
+        "passed"
+      ]
+    },
+
+    "serviceStatus": {
+      "type": "string",
+      "description": "Service operational status",
+      "enum": [
+        "operational",
+        "degraded",
+        "outage",
+        "maintenance",
+        "planned"
+      ]
+    },
+
+    "ipType": {
+      "type": "string",
+      "description": "Intellectual property type",
+      "enum": [
+        "patent",
+        "trademark",
+        "copyright",
+        "trade-secret"
+      ]
+    },
+
+    "ipStatus": {
+      "type": "string",
+      "description": "Intellectual property status",
+      "enum": [
+        "filed",
+        "pending",
+        "granted",
+        "active",
+        "expired",
+        "abandoned"
+      ]
+    },
+
+    "quarter": {
+      "type": "string",
+      "description": "Quarter identifier pattern",
+      "pattern": "^q[1-4]_20[0-9]{2}$"
+    },
+
+    "semver": {
+      "type": "string",
+      "description": "Semantic version string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+
+    "ventureIdPattern": {
+      "type": "string",
+      "description": "Valid venture ID format (lowercase, hyphenated)",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+
+    "hexColor": {
+      "type": "string",
+      "description": "Hex color code",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
+    }
+  }
+}
