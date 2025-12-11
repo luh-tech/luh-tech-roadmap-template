@@ -1,0 +1,559 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/portfolio-v1.json",
+  "title": "LuhTech Portfolio Schema",
+  "description": "Holdings-level schema capturing the complete LuhTech venture portfolio structure, strategic narrative, cross-venture relationships, IP assets, and key relationships.",
+  "type": "object",
+  "required": ["$schema", "schemaVersion", "meta", "ventures", "narrative"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://luhtech.dev/schemas/portfolio-v1.json"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "SemVer version of this schema instance"
+    },
+    "meta": {
+      "$ref": "#/definitions/portfolioMeta"
+    },
+    "ventures": {
+      "type": "array",
+      "description": "All ventures in the portfolio",
+      "items": {
+        "$ref": "#/definitions/portfolioVenture"
+      },
+      "minItems": 1
+    },
+    "narrative": {
+      "$ref": "#/definitions/portfolioNarrative"
+    },
+    "ipAssets": {
+      "type": "array",
+      "description": "Portfolio-wide intellectual property assets",
+      "items": {
+        "$ref": "#/definitions/ipAsset"
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "description": "Key stakeholder relationships",
+      "items": {
+        "$ref": "#/definitions/relationship"
+      }
+    },
+    "dealflow": {
+      "type": "array",
+      "description": "Active pipeline items",
+      "items": {
+        "$ref": "#/definitions/pipelineItem"
+      }
+    },
+    "milestones": {
+      "type": "array",
+      "description": "Portfolio-level milestones",
+      "items": {
+        "$ref": "#/definitions/portfolioMilestone"
+      }
+    },
+    "accelerator": {
+      "$ref": "#/definitions/acceleratorThesis"
+    }
+  },
+  "definitions": {
+    "portfolioMeta": {
+      "type": "object",
+      "description": "Portfolio document metadata",
+      "required": ["name", "lastUpdated", "status"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Portfolio/holding company name"
+        },
+        "tagline": {
+          "type": "string",
+          "description": "Portfolio tagline"
+        },
+        "domain": {
+          "type": "string",
+          "format": "hostname",
+          "description": "Primary domain"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "paused", "archived", "draft"],
+          "description": "Portfolio document status"
+        },
+        "author": {
+          "type": "string",
+          "description": "Last updated by"
+        },
+        "founder": {
+          "type": "string",
+          "description": "Portfolio founder"
+        },
+        "founded": {
+          "type": "string",
+          "format": "date",
+          "description": "Founding date"
+        }
+      }
+    },
+
+    "portfolioVenture": {
+      "type": "object",
+      "description": "Venture entry in the portfolio",
+      "required": ["id", "name", "layer", "status"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Canonical venture ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "tagline": {
+          "type": "string",
+          "description": "One-liner description"
+        },
+        "layer": {
+          "type": "string",
+          "enum": ["flagship", "base-triad", "extension", "vendor", "independent", "holding"],
+          "description": "Portfolio layer classification"
+        },
+        "type": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "array", "items": {"type": "string"}}
+          ],
+          "description": "Venture type(s)"
+        },
+        "architecture": {
+          "type": "string",
+          "enum": ["Cloud-First", "Edge-First", "Hybrid", "API-Only", "Platform", "Edge + Cloud"],
+          "description": "Technical architecture"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "paused", "archived", "draft", "r&d", "planning", "pilot"],
+          "description": "Venture operational status"
+        },
+        "stage": {
+          "type": "string",
+          "enum": ["concept", "poc", "pre-seed", "seed", "series-a", "growth"],
+          "description": "Development/funding stage"
+        },
+        "forkParent": {
+          "type": ["string", "null"],
+          "description": "Parent venture ID if forked"
+        },
+        "codeReuse": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of code inherited"
+        },
+        "domain": {
+          "type": "string",
+          "format": "hostname",
+          "description": "Primary domain"
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "description": "GitHub repository"
+        },
+        "roadmapPath": {
+          "type": "string",
+          "description": "Path to venture roadmap file"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Primary owner/operator"
+        },
+        "erikHoursPerWeek": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 80,
+          "description": "Current Erik allocation"
+        }
+      }
+    },
+
+    "portfolioNarrative": {
+      "type": "object",
+      "description": "Strategic narrative for pitching the portfolio",
+      "required": ["thesis", "layers"],
+      "properties": {
+        "thesis": {
+          "type": "string",
+          "description": "Portfolio investment thesis"
+        },
+        "problem": {
+          "type": "string",
+          "description": "Industry problem being solved"
+        },
+        "solution": {
+          "type": "string",
+          "description": "Portfolio approach"
+        },
+        "triad": {
+          "type": "object",
+          "description": "Core triad definition (flagship + base ventures)",
+          "properties": {
+            "flagship": {
+              "type": "string",
+              "description": "Flagship venture ID"
+            },
+            "base": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Base triad venture IDs"
+            },
+            "description": {
+              "type": "string",
+              "description": "Triad narrative"
+            }
+          }
+        },
+        "layers": {
+          "type": "array",
+          "description": "Portfolio layer definitions",
+          "items": {
+            "type": "object",
+            "required": ["name", "ventures"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "enum": ["flagship", "base-triad", "extension", "vendor", "independent", "holding"]
+              },
+              "description": {
+                "type": "string"
+              },
+              "ventures": {
+                "type": "array",
+                "items": {"type": "string"}
+              }
+            }
+          }
+        },
+        "pitchArc": {
+          "type": "array",
+          "description": "Pitch flow sequence",
+          "items": {
+            "type": "object",
+            "properties": {
+              "step": {"type": "integer"},
+              "title": {"type": "string"},
+              "narrative": {"type": "string"}
+            }
+          }
+        },
+        "differentiators": {
+          "type": "array",
+          "description": "Key portfolio differentiators",
+          "items": {"type": "string"}
+        },
+        "synergies": {
+          "type": "array",
+          "description": "Cross-venture synergies",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ventures": {"type": "array", "items": {"type": "string"}},
+              "description": {"type": "string"},
+              "value": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+
+    "ipAsset": {
+      "type": "object",
+      "description": "Intellectual property asset (summary)",
+      "required": ["id", "type", "status", "title"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique IP asset identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["patent", "trademark", "copyright", "trade-secret"],
+          "description": "IP type"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["filed", "pending", "granted", "active", "expired", "abandoned"],
+          "description": "IP status"
+        },
+        "title": {
+          "type": "string",
+          "description": "IP title"
+        },
+        "number": {
+          "type": "string",
+          "description": "Patent/trademark number"
+        },
+        "filingDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Filing date"
+        },
+        "grantDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Grant date"
+        },
+        "expirationDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Expiration date"
+        },
+        "ventureId": {
+          "type": "string",
+          "description": "Associated venture"
+        },
+        "inventors": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Inventors/creators"
+        },
+        "claims": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Key claims (patents)"
+        },
+        "jurisdiction": {
+          "type": "string",
+          "description": "Jurisdiction (US, EU, etc.)"
+        },
+        "link": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to IP document"
+        }
+      }
+    },
+
+    "relationship": {
+      "type": "object",
+      "description": "Key stakeholder relationship",
+      "required": ["id", "name", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique relationship ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Person or organization name"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["investor", "partner", "customer", "advisor", "founder-candidate", "vendor", "accelerator", "employee"],
+          "description": "Relationship type"
+        },
+        "organization": {
+          "type": "string",
+          "description": "Associated organization"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role/title"
+        },
+        "ventures": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Associated venture IDs"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "dormant", "past"],
+          "description": "Relationship status"
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "email": {"type": "string", "format": "email"},
+            "linkedin": {"type": "string", "format": "uri"},
+            "phone": {"type": "string"}
+          }
+        },
+        "notes": {
+          "type": "string",
+          "description": "Relationship notes"
+        },
+        "lastContact": {
+          "type": "string",
+          "format": "date",
+          "description": "Last contact date"
+        }
+      }
+    },
+
+    "pipelineItem": {
+      "type": "object",
+      "description": "Dealflow pipeline entry",
+      "required": ["id", "name", "type", "stage"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Pipeline item ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Deal/opportunity name"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["funding", "partnership", "customer", "acquisition", "hire"],
+          "description": "Pipeline type"
+        },
+        "stage": {
+          "type": "string",
+          "enum": ["prospect", "contacted", "meeting", "due-diligence", "term-sheet", "closed-won", "closed-lost", "passed"],
+          "description": "Pipeline stage"
+        },
+        "ventureId": {
+          "type": "string",
+          "description": "Associated venture"
+        },
+        "value": {
+          "type": "string",
+          "description": "Deal value"
+        },
+        "probability": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Close probability %"
+        },
+        "targetClose": {
+          "type": "string",
+          "format": "date",
+          "description": "Target close date"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Deal owner"
+        },
+        "nextAction": {
+          "type": "string",
+          "description": "Next action required"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+
+    "portfolioMilestone": {
+      "type": "object",
+      "description": "Portfolio-level milestone",
+      "required": ["id", "date", "event"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Milestone ID"
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "Target date"
+        },
+        "event": {
+          "type": "string",
+          "description": "Milestone description"
+        },
+        "ventures": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Affected ventures"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["technical", "business", "funding", "team", "launch", "partnership", "ip"],
+          "description": "Milestone type"
+        },
+        "gate": {
+          "type": "boolean",
+          "description": "Is this a gate milestone?"
+        },
+        "critical": {
+          "type": "boolean",
+          "description": "Is this critical path?"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["complete", "current", "planned"],
+          "description": "Milestone status"
+        },
+        "dependsOn": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Dependent milestone IDs"
+        }
+      }
+    },
+
+    "acceleratorThesis": {
+      "type": "object",
+      "description": "Accelerator program thesis and structure",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Accelerator program name"
+        },
+        "thesis": {
+          "type": "string",
+          "description": "Accelerator investment thesis"
+        },
+        "targetIndustry": {
+          "type": "string",
+          "description": "Target industry"
+        },
+        "templateVentures": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Template venture IDs for accelerator"
+        },
+        "offerings": {
+          "type": "array",
+          "description": "What accelerator provides",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "description": {"type": "string"},
+              "value": {"type": "string"}
+            }
+          }
+        },
+        "terms": {
+          "type": "object",
+          "description": "Standard accelerator terms",
+          "properties": {
+            "equity": {"type": "string"},
+            "investment": {"type": "string"},
+            "duration": {"type": "string"}
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": ["concept", "developing", "active", "paused"],
+          "description": "Accelerator program status"
+        }
+      }
+    }
+  }
+}

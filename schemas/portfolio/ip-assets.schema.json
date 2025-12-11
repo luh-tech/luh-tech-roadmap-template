@@ -1,0 +1,341 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/ip-assets-v1.json",
+  "title": "LuhTech IP Assets Registry",
+  "description": "Comprehensive intellectual property tracking for all portfolio ventures including patents, trademarks, copyrights, and trade secrets.",
+  "type": "object",
+  "required": ["$schema", "schemaVersion", "meta", "assets"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://luhtech.dev/schemas/ip-assets-v1.json"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "meta": {
+      "type": "object",
+      "required": ["lastUpdated"],
+      "properties": {
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "author": {
+          "type": "string"
+        },
+        "legalCounsel": {
+          "type": "string"
+        }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ipAsset"
+      }
+    },
+    "pendingFilings": {
+      "type": "array",
+      "description": "IP filings in progress",
+      "items": {
+        "$ref": "#/definitions/pendingFiling"
+      }
+    },
+    "ipStrategy": {
+      "$ref": "#/definitions/ipStrategy"
+    }
+  },
+  "definitions": {
+    "ipAsset": {
+      "type": "object",
+      "required": ["id", "type", "status", "title", "ventureId"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^ip-[a-z0-9-]+$",
+          "description": "Unique IP asset identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["patent", "trademark", "copyright", "trade-secret"],
+          "description": "IP type classification"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["filed", "pending", "granted", "active", "expired", "abandoned", "provisional"],
+          "description": "Current IP status"
+        },
+        "title": {
+          "type": "string",
+          "description": "Official IP title"
+        },
+        "ventureId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Owning venture ID"
+        },
+        "assignee": {
+          "type": "string",
+          "description": "Legal assignee entity"
+        },
+
+        "patent": {
+          "type": "object",
+          "description": "Patent-specific details",
+          "properties": {
+            "number": {
+              "type": "string",
+              "description": "Patent number (e.g., US 9,322,165 B2)"
+            },
+            "applicationNumber": {
+              "type": "string",
+              "description": "Application number"
+            },
+            "filingDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "grantDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "expirationDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "inventors": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "claims": {
+              "type": "array",
+              "description": "Key patent claims",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "number": {"type": "integer"},
+                  "type": {"type": "string", "enum": ["independent", "dependent"]},
+                  "summary": {"type": "string"}
+                }
+              }
+            },
+            "classifications": {
+              "type": "array",
+              "description": "Patent classifications (CPC, IPC)",
+              "items": {"type": "string"}
+            },
+            "citations": {
+              "type": "object",
+              "properties": {
+                "citedBy": {"type": "integer"},
+                "cites": {"type": "integer"}
+              }
+            },
+            "family": {
+              "type": "array",
+              "description": "Related patent family members",
+              "items": {"type": "string"}
+            }
+          }
+        },
+
+        "trademark": {
+          "type": "object",
+          "description": "Trademark-specific details",
+          "properties": {
+            "registrationNumber": {
+              "type": "string"
+            },
+            "serialNumber": {
+              "type": "string"
+            },
+            "mark": {
+              "type": "string",
+              "description": "The trademark itself"
+            },
+            "markType": {
+              "type": "string",
+              "enum": ["wordmark", "logo", "combined", "sound", "color"]
+            },
+            "classes": {
+              "type": "array",
+              "description": "Nice Classification classes",
+              "items": {"type": "integer"}
+            },
+            "filingDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "registrationDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "renewalDate": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        },
+
+        "copyright": {
+          "type": "object",
+          "description": "Copyright-specific details",
+          "properties": {
+            "registrationNumber": {
+              "type": "string"
+            },
+            "workType": {
+              "type": "string",
+              "enum": ["software", "documentation", "artwork", "video", "audio"]
+            },
+            "creationDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "publicationDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "authors": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          }
+        },
+
+        "tradeSecret": {
+          "type": "object",
+          "description": "Trade secret details",
+          "properties": {
+            "category": {
+              "type": "string",
+              "enum": ["algorithm", "process", "formula", "design", "customer-list", "business-method"]
+            },
+            "protectionMeasures": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "accessLevel": {
+              "type": "string",
+              "enum": ["founder-only", "executive", "team", "nda-required"]
+            },
+            "documentedDate": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        },
+
+        "jurisdiction": {
+          "type": "string",
+          "description": "Primary jurisdiction"
+        },
+        "additionalJurisdictions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Additional filing jurisdictions"
+        },
+        "link": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to official IP record"
+        },
+        "internalDocuments": {
+          "type": "array",
+          "description": "Internal documentation links",
+          "items": {"type": "string", "format": "uri"}
+        },
+        "value": {
+          "type": "object",
+          "description": "IP valuation",
+          "properties": {
+            "estimate": {"type": "string"},
+            "method": {"type": "string"},
+            "date": {"type": "string", "format": "date"}
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+
+    "pendingFiling": {
+      "type": "object",
+      "required": ["id", "type", "title", "ventureId", "targetDate"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["patent", "trademark", "copyright"]
+        },
+        "title": {
+          "type": "string"
+        },
+        "ventureId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["research", "drafting", "review", "ready-to-file"]
+        },
+        "assignedTo": {
+          "type": "string"
+        },
+        "budget": {
+          "type": "string"
+        }
+      }
+    },
+
+    "ipStrategy": {
+      "type": "object",
+      "description": "Portfolio IP strategy",
+      "properties": {
+        "philosophy": {
+          "type": "string",
+          "description": "Overall IP strategy"
+        },
+        "priorities": {
+          "type": "array",
+          "description": "Strategic IP priorities",
+          "items": {
+            "type": "object",
+            "properties": {
+              "area": {"type": "string"},
+              "rationale": {"type": "string"},
+              "ventures": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        },
+        "defensivePositions": {
+          "type": "array",
+          "description": "Defensive IP positions",
+          "items": {"type": "string"}
+        },
+        "licensingStrategy": {
+          "type": "string",
+          "description": "IP licensing approach"
+        },
+        "annualBudget": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
