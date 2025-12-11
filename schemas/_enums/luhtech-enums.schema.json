@@ -8,12 +8,17 @@
       "type": "object",
       "description": "Schema metadata - not for validation",
       "properties": {
-        "version": {"const": "1.0.0"},
-        "lastUpdated": {"const": "2025-12-10"},
-        "maintainer": {"const": "LuhTech Enterprise Infrastructure"}
+        "version": {
+          "const": "1.0.0"
+        },
+        "lastUpdated": {
+          "const": "2025-12-10"
+        },
+        "maintainer": {
+          "const": "LuhTech Enterprise Infrastructure"
+        }
       }
     },
-
     "ventureId": {
       "type": "string",
       "description": "Canonical venture identifiers across the LuhTech portfolio",
@@ -28,7 +33,6 @@
         "luhtech"
       ]
     },
-
     "portfolioLayer": {
       "type": "string",
       "description": "Portfolio strategic layer classification",
@@ -41,7 +45,6 @@
         "holding"
       ]
     },
-
     "documentStatus": {
       "type": "string",
       "description": "Document/roadmap lifecycle status",
@@ -55,7 +58,6 @@
         "pilot"
       ]
     },
-
     "ventureStage": {
       "type": "string",
       "description": "Venture development/funding stage",
@@ -68,7 +70,6 @@
         "growth"
       ]
     },
-
     "ventureType": {
       "type": "string",
       "description": "Primary venture business type",
@@ -81,7 +82,6 @@
         "Holding"
       ]
     },
-
     "architecture": {
       "type": "string",
       "description": "Technical architecture pattern",
@@ -94,7 +94,6 @@
         "Edge + Cloud"
       ]
     },
-
     "milestoneType": {
       "type": "string",
       "description": "Milestone category classification",
@@ -109,7 +108,6 @@
         "ip"
       ]
     },
-
     "milestoneStatus": {
       "type": "string",
       "description": "Timeline milestone completion status",
@@ -119,7 +117,6 @@
         "planned"
       ]
     },
-
     "deliverableStatus": {
       "type": "string",
       "description": "Deliverable/work item status",
@@ -131,7 +128,6 @@
         "deferred"
       ]
     },
-
     "featureStatus": {
       "type": "string",
       "description": "Feature development lifecycle status",
@@ -144,7 +140,6 @@
         "deprecated"
       ]
     },
-
     "dependencyDirection": {
       "type": "string",
       "description": "Dependency relationship direction (roadmap context)",
@@ -156,7 +151,6 @@
         "external"
       ]
     },
-
     "dependencyType": {
       "type": "string",
       "description": "Dependency category type (dependencies schema)",
@@ -170,7 +164,6 @@
         "external"
       ]
     },
-
     "dependencyStatus": {
       "type": "string",
       "description": "Dependency resolution status",
@@ -182,7 +175,6 @@
         "blocked"
       ]
     },
-
     "impactLevel": {
       "type": "string",
       "description": "Impact or severity level",
@@ -193,7 +185,6 @@
         "low"
       ]
     },
-
     "riskLevel": {
       "type": "string",
       "description": "Risk probability or impact assessment",
@@ -205,7 +196,6 @@
         "critical"
       ]
     },
-
     "provisionType": {
       "type": "string",
       "description": "Provision/capability type offered",
@@ -217,7 +207,6 @@
         "library"
       ]
     },
-
     "provisionStatus": {
       "type": "string",
       "description": "Provision availability status",
@@ -228,7 +217,6 @@
         "deprecated"
       ]
     },
-
     "templateStatus": {
       "type": "string",
       "description": "Template application status",
@@ -238,7 +226,6 @@
         "customized"
       ]
     },
-
     "sharedResourceType": {
       "type": "string",
       "description": "Shared infrastructure resource type",
@@ -248,10 +235,10 @@
         "auth-service",
         "storage",
         "cdn",
-        "ci-cd"
+        "ci-cd",
+        "library"
       ]
     },
-
     "accessLevel": {
       "type": "string",
       "description": "Resource access permission level",
@@ -261,7 +248,6 @@
         "admin"
       ]
     },
-
     "fundingStatus": {
       "type": "string",
       "description": "Funding round status",
@@ -272,7 +258,6 @@
         "closed"
       ]
     },
-
     "trend": {
       "type": "string",
       "description": "Metric trend direction",
@@ -282,7 +267,6 @@
         "flat"
       ]
     },
-
     "relationshipType": {
       "type": "string",
       "description": "Stakeholder relationship category",
@@ -297,7 +281,6 @@
         "employee"
       ]
     },
-
     "pipelineStage": {
       "type": "string",
       "description": "Dealflow/pipeline stage",
@@ -312,7 +295,6 @@
         "passed"
       ]
     },
-
     "serviceStatus": {
       "type": "string",
       "description": "Service operational status",
@@ -324,7 +306,6 @@
         "planned"
       ]
     },
-
     "ipType": {
       "type": "string",
       "description": "Intellectual property type",
@@ -335,7 +316,6 @@
         "trade-secret"
       ]
     },
-
     "ipStatus": {
       "type": "string",
       "description": "Intellectual property status",
@@ -348,25 +328,21 @@
         "abandoned"
       ]
     },
-
     "quarter": {
       "type": "string",
       "description": "Quarter identifier pattern",
       "pattern": "^q[1-4]_20[0-9]{2}$"
     },
-
     "semver": {
       "type": "string",
       "description": "Semantic version string",
       "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
-
     "ventureIdPattern": {
       "type": "string",
       "description": "Valid venture ID format (lowercase, hyphenated)",
       "pattern": "^[a-z][a-z0-9-]*$"
     },
-
     "hexColor": {
       "type": "string",
       "description": "Hex color code",
