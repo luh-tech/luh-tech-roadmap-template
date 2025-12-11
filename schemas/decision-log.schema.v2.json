@@ -9,7 +9,7 @@
   "properties": {
     "$schema": {"type": "string", "const": "https://luhtech.dev/schemas/decision-log-v2.json"},
     "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$", "description": "Document version (semver)"},
-    "ventureId": {"$ref": "./_enums/luhtech-enums.schema.json#/definitions/ventureId"},
+    "ventureId": {"$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureId"},
     "lastUpdated": {"type": "string", "format": "date-time", "description": "Last modification timestamp"},
     "decisions": {"type": "array", "description": "Decision entries", "items": {"$ref": "#/definitions/decision"}},
     "indexes": {
@@ -63,7 +63,7 @@
         },
         "status": {"type": "string", "enum": ["proposed", "approved", "implemented", "superseded", "rejected", "deferred"], "description": "Decision status"},
         "category": {"type": "string", "enum": ["architecture", "infrastructure", "api-design", "security", "governance", "business", "product", "team", "funding", "legal", "vendor", "process", "tooling"], "description": "Decision category"},
-        "impact": {"$ref": "./_enums/luhtech-enums.schema.json#/definitions/impactLevel"},
+        "impact": {"$ref": "https://luhtech.dev/schemas/enums.json#/definitions/impactLevel"},
         "approvedBy": {"type": "array", "items": {"type": "string"}, "description": "Approvers"},
         "approvalDate": {"type": "string", "format": "date-time", "description": "Approval timestamp"},
         "implementedDate": {"type": "string", "format": "date-time", "description": "Implementation completion date"},
@@ -81,7 +81,7 @@
         "lastReviewed": {"type": "string", "format": "date", "description": "Last review date"},
         "notes": {"type": "array", "description": "Timestamped annotations", "items": {"$ref": "#/definitions/decisionNote"}},
         "metrics": {"type": "object", "description": "Decision outcome metrics", "additionalProperties": true},
-        "externalLinks": {"type": "array", "items": {"$ref": "./_definitions/definitions.schema.json#/definitions/link"}, "description": "External documentation links"}
+        "externalLinks": {"type": "array", "items": {"$ref": "https://luhtech.dev/schemas/definitions.json#/definitions/link"}, "description": "External documentation links"}
       }
     },
     "alternative": {
@@ -95,7 +95,7 @@
         "cons": {"type": "array", "items": {"type": "string"}, "description": "Disadvantages"},
         "estimatedEffort": {"type": "string", "description": "Effort estimate"},
         "estimatedCost": {"type": "string", "description": "Cost estimate"},
-        "riskLevel": {"$ref": "./_enums/luhtech-enums.schema.json#/definitions/riskLevel"},
+        "riskLevel": {"$ref": "https://luhtech.dev/schemas/enums.json#/definitions/riskLevel"},
         "feasibility": {"type": "string", "enum": ["high", "medium", "low"], "description": "Technical feasibility"},
         "score": {"type": "number", "minimum": 0, "maximum": 10, "description": "Weighted evaluation score"},
         "rejectionReason": {"type": "string", "description": "Why this option wasn't chosen"}

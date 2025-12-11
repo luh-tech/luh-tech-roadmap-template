@@ -17,7 +17,7 @@
       "description": "Catalog version (semver)"
     },
     "ventureId": {
-      "$ref": "./_enums/luhtech-enums.schema.json#/definitions/ventureId"
+      "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureId"
     },
     "lastUpdated": {
       "type": "string",
@@ -95,7 +95,7 @@
     "notes": {
       "type": "array",
       "description": "Infrastructure notes and annotations",
-      "items": {"$ref": "./_definitions/definitions.schema.json#/definitions/note"}
+      "items": {"$ref": "https://luhtech.dev/schemas/definitions.json#/definitions/note"}
     }
   },
   "definitions": {
@@ -274,7 +274,7 @@
           }
         },
         "status": {
-          "$ref": "./_enums/luhtech-enums.schema.json#/definitions/serviceStatus"
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/serviceStatus"
         }
       }
     },
@@ -618,7 +618,7 @@
           "type": "string"
         },
         "riskLevel": {
-          "$ref": "./_enums/luhtech-enums.schema.json#/definitions/riskLevel"
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/riskLevel"
         }
       }
     },

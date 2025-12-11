@@ -17,7 +17,7 @@
       "description": "Document version (semver)"
     },
     "ventureId": {
-      "$ref": "./_enums/luhtech-enums.schema.json#/definitions/ventureId"
+      "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureId"
     },
     "lastUpdated": {
       "type": "string",
@@ -109,7 +109,7 @@
     "notes": {
       "type": "array",
       "description": "Tech stack notes and annotations",
-      "items": {"$ref": "./_definitions/definitions.schema.json#/definitions/note"}
+      "items": {"$ref": "https://luhtech.dev/schemas/definitions.json#/definitions/note"}
     }
   },
   "definitions": {
@@ -316,7 +316,7 @@
         "id": {"type": "string", "pattern": "^td-[a-z0-9-]+$"},
         "title": {"type": "string"},
         "description": {"type": "string"},
-        "impact": {"$ref": "./_enums/luhtech-enums.schema.json#/definitions/impactLevel"},
+        "impact": {"$ref": "https://luhtech.dev/schemas/enums.json#/definitions/impactLevel"},
         "effort": {"type": "string", "enum": ["trivial", "small", "medium", "large", "epic"]},
         "category": {"type": "string", "enum": ["dependency-update", "refactoring", "testing", "documentation", "security", "performance", "architecture"]},
         "createdDate": {"type": "string", "format": "date"},
@@ -338,7 +338,7 @@
         "rationale": {"type": "string"},
         "targetDate": {"type": "string", "format": "date"},
         "effort": {"type": "string", "enum": ["small", "medium", "large", "epic"]},
-        "riskLevel": {"$ref": "./_enums/luhtech-enums.schema.json#/definitions/riskLevel"},
+        "riskLevel": {"$ref": "https://luhtech.dev/schemas/enums.json#/definitions/riskLevel"},
         "relatedDecision": {"type": "string", "description": "Decision log reference"}
       }
     },
