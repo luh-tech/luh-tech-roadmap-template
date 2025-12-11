@@ -1,14 +1,22 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://luhtech.dev/schemas/venture-summary-v1.json",
+  "$id": "https://luhtech.dev/schemas/venture-summary.json",
   "title": "Venture Summary",
-  "description": "Investor-ready venture summary for pitch decks and accelerator reporting. Integrates with slide-generator.",
+  "description": "Investor-ready venture summary for pitch decks and accelerator reporting. Integrates with slide-generator. v1.1.0 migrates inline enums to centralized $ref definitions.",
   "type": "object",
   "required": ["$schema", "version", "venture", "pitch", "metrics"],
   "properties": {
-    "$schema": {"type": "string", "const": "https://luhtech.dev/schemas/venture-summary-v1.json"},
-    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
-    "lastUpdated": {"type": "string", "format": "date-time"},
+    "$schema": {
+      "type": "string",
+      "enum": ["https://luhtech.dev/schemas/venture-summary.json", "https://luhtech.dev/schemas/venture-summary-v1.json"]
+    },
+    "version": {
+      "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/semver"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time"
+    },
     "venture": {"$ref": "#/definitions/ventureIdentity"},
     "pitch": {"$ref": "#/definitions/pitchDeck"},
     "metrics": {"$ref": "#/definitions/currentMetrics"},
@@ -22,14 +30,35 @@
       "type": "object",
       "required": ["id", "name", "tagline", "stage"],
       "properties": {
-        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
-        "name": {"type": "string", "maxLength": 100},
-        "tagline": {"type": "string", "maxLength": 100},
-        "stage": {"type": "string", "enum": ["concept", "poc", "pre-seed", "seed", "series-a", "growth"]},
-        "founded": {"type": "string", "format": "date"},
-        "domain": {"type": "string", "format": "hostname"},
-        "industry": {"type": "array", "items": {"type": "string"}},
-        "location": {"type": "string"}
+        "id": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureIdPattern"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "tagline": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "stage": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureStage"
+        },
+        "founded": {
+          "type": "string",
+          "format": "date"
+        },
+        "domain": {
+          "type": "string",
+          "format": "hostname"
+        },
+        "industry": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "location": {
+          "type": "string"
+        }
       }
     },
     "pitchDeck": {
@@ -50,10 +79,23 @@
       "type": "object",
       "required": ["headline"],
       "properties": {
-        "headline": {"type": "string", "maxLength": 100},
-        "subheadline": {"type": "string", "maxLength": 200},
-        "bullets": {"type": "array", "items": {"type": "string"}, "maxItems": 5},
-        "narrative": {"type": "string", "maxLength": 500}
+        "headline": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "subheadline": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "bullets": {
+          "type": "array",
+          "items": {"type": "string"},
+          "maxItems": 5
+        },
+        "narrative": {
+          "type": "string",
+          "maxLength": 500
+        }
       }
     },
     "marketSlide": {
@@ -61,11 +103,32 @@
       "required": ["tam", "sam", "som"],
       "properties": {
         "headline": {"type": "string"},
-        "tam": {"type": "object", "properties": {"value": {"type": "string"}, "description": {"type": "string"}}},
-        "sam": {"type": "object", "properties": {"value": {"type": "string"}, "description": {"type": "string"}}},
-        "som": {"type": "object", "properties": {"value": {"type": "string"}, "description": {"type": "string"}}},
+        "tam": {
+          "type": "object",
+          "properties": {
+            "value": {"type": "string"},
+            "description": {"type": "string"}
+          }
+        },
+        "sam": {
+          "type": "object",
+          "properties": {
+            "value": {"type": "string"},
+            "description": {"type": "string"}
+          }
+        },
+        "som": {
+          "type": "object",
+          "properties": {
+            "value": {"type": "string"},
+            "description": {"type": "string"}
+          }
+        },
         "growthRate": {"type": "string"},
-        "trends": {"type": "array", "items": {"type": "string"}}
+        "trends": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
       }
     },
     "businessModelSlide": {
@@ -74,17 +137,63 @@
       "properties": {
         "headline": {"type": "string"},
         "revenueModel": {"type": "string"},
-        "pricing": {"type": "array", "items": {"type": "object", "properties": {"tier": {"type": "string"}, "price": {"type": "string"}, "features": {"type": "array", "items": {"type": "string"}}}}},
-        "unitEconomics": {"type": "object", "properties": {"cac": {"type": "string"}, "ltv": {"type": "string"}, "paybackPeriod": {"type": "string"}, "grossMargin": {"type": "string"}}}
+        "pricing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tier": {"type": "string"},
+              "price": {"type": "string"},
+              "features": {
+                "type": "array",
+                "items": {"type": "string"}
+              }
+            }
+          }
+        },
+        "unitEconomics": {
+          "type": "object",
+          "properties": {
+            "cac": {"type": "string"},
+            "ltv": {"type": "string"},
+            "paybackPeriod": {"type": "string"},
+            "grossMargin": {"type": "string"}
+          }
+        }
       }
     },
     "tractionSlide": {
       "type": "object",
       "properties": {
         "headline": {"type": "string"},
-        "metrics": {"type": "array", "items": {"type": "object", "properties": {"label": {"type": "string"}, "value": {"type": "string"}, "trend": {"type": "string", "enum": ["up", "down", "flat"]}}}},
-        "customers": {"type": "array", "items": {"type": "string"}},
-        "testimonials": {"type": "array", "items": {"type": "object", "properties": {"quote": {"type": "string"}, "author": {"type": "string"}, "company": {"type": "string"}}}}
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {"type": "string"},
+              "value": {"type": "string"},
+              "trend": {
+                "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/trend"
+              }
+            }
+          }
+        },
+        "customers": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "testimonials": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "quote": {"type": "string"},
+              "author": {"type": "string"},
+              "company": {"type": "string"}
+            }
+          }
+        }
       }
     },
     "askSlide": {
@@ -93,15 +202,43 @@
       "properties": {
         "headline": {"type": "string"},
         "amount": {"type": "string"},
-        "useOfFunds": {"type": "array", "items": {"type": "object", "properties": {"category": {"type": "string"}, "percentage": {"type": "integer"}, "description": {"type": "string"}}}},
-        "milestones": {"type": "array", "items": {"type": "string"}}
+        "useOfFunds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "category": {"type": "string"},
+              "percentage": {"type": "integer"},
+              "description": {"type": "string"}
+            }
+          }
+        },
+        "milestones": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
       }
     },
     "timelineSlide": {
       "type": "object",
       "properties": {
         "headline": {"type": "string"},
-        "milestones": {"type": "array", "items": {"type": "object", "properties": {"date": {"type": "string", "format": "date"}, "label": {"type": "string"}, "status": {"type": "string", "enum": ["complete", "current", "planned"]}}}}
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "label": {"type": "string"},
+              "status": {
+                "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/milestoneStatus"
+              }
+            }
+          }
+        }
       }
     },
     "currentMetrics": {
@@ -114,16 +251,28 @@
         "growth": {"type": "string"},
         "nps": {"type": "integer"},
         "churn": {"type": "string"},
-        "custom": {"type": "object", "additionalProperties": true}
+        "custom": {
+          "type": "object",
+          "additionalProperties": true
+        }
       }
     },
     "teamInfo": {
       "type": "object",
       "properties": {
         "size": {"type": "integer"},
-        "founders": {"type": "array", "items": {"$ref": "#/definitions/teamMember"}},
-        "advisors": {"type": "array", "items": {"$ref": "#/definitions/teamMember"}},
-        "keyHires": {"type": "array", "items": {"type": "string"}}
+        "founders": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/teamMember"}
+        },
+        "advisors": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/teamMember"}
+        },
+        "keyHires": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
       }
     },
     "teamMember": {
@@ -133,33 +282,106 @@
         "name": {"type": "string"},
         "role": {"type": "string"},
         "bio": {"type": "string"},
-        "linkedin": {"type": "string", "format": "uri"},
-        "image": {"type": "string", "format": "uri"}
+        "linkedin": {
+          "type": "string",
+          "format": "uri"
+        },
+        "image": {
+          "type": "string",
+          "format": "uri"
+        }
       }
     },
     "fundingInfo": {
       "type": "object",
       "properties": {
         "totalRaised": {"type": "string"},
-        "currentRound": {"type": "object", "properties": {"type": {"type": "string"}, "target": {"type": "string"}, "raised": {"type": "string"}, "status": {"type": "string", "enum": ["planning", "raising", "closing", "closed"]}}},
-        "investors": {"type": "array", "items": {"type": "string"}},
+        "currentRound": {
+          "type": "object",
+          "properties": {
+            "type": {"type": "string"},
+            "target": {"type": "string"},
+            "raised": {"type": "string"},
+            "status": {
+              "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/fundingStatus"
+            }
+          }
+        },
+        "investors": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
         "runway": {"type": "integer"}
       }
     },
     "milestonesSummary": {
       "type": "object",
       "properties": {
-        "achieved": {"type": "array", "items": {"type": "object", "properties": {"date": {"type": "string", "format": "date"}, "milestone": {"type": "string"}}}},
-        "upcoming": {"type": "array", "items": {"type": "object", "properties": {"date": {"type": "string", "format": "date"}, "milestone": {"type": "string"}}}}
+        "achieved": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "milestone": {"type": "string"}
+            }
+          }
+        },
+        "upcoming": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "milestone": {"type": "string"}
+            }
+          }
+        }
       }
     },
     "brandAssets": {
       "type": "object",
       "properties": {
-        "logo": {"type": "object", "properties": {"primary": {"type": "string"}, "light": {"type": "string"}, "dark": {"type": "string"}, "icon": {"type": "string"}}},
-        "colors": {"type": "object", "properties": {"primary": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"}, "secondary": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"}, "accent": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"}}},
-        "fonts": {"type": "object", "properties": {"heading": {"type": "string"}, "body": {"type": "string"}}},
-        "backgrounds": {"type": "array", "items": {"type": "string"}}
+        "logo": {
+          "type": "object",
+          "properties": {
+            "primary": {"type": "string"},
+            "light": {"type": "string"},
+            "dark": {"type": "string"},
+            "icon": {"type": "string"}
+          }
+        },
+        "colors": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/hexColor"
+            },
+            "secondary": {
+              "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/hexColor"
+            },
+            "accent": {
+              "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/hexColor"
+            }
+          }
+        },
+        "fonts": {
+          "type": "object",
+          "properties": {
+            "heading": {"type": "string"},
+            "body": {"type": "string"}
+          }
+        },
+        "backgrounds": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
       }
     }
   }

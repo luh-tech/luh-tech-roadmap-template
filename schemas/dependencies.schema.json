@@ -1,71 +1,169 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://luhtech.dev/schemas/dependencies-v1.json",
+  "$id": "https://luhtech.dev/schemas/dependencies.json",
   "title": "Venture Dependencies",
-  "description": "Cross-venture dependency tracking for portfolio-wide coordination and conflict detection.",
+  "description": "Cross-venture dependency tracking for portfolio-wide coordination and conflict detection. v1.1.0 migrates inline enums to centralized $ref definitions.",
   "type": "object",
   "required": ["$schema", "version", "ventureId", "dependencies"],
   "properties": {
-    "$schema": {"type": "string", "const": "https://luhtech.dev/schemas/dependencies-v1.json"},
-    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
-    "ventureId": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
-    "lastUpdated": {"type": "string", "format": "date-time"},
-    "dependencies": {"type": "array", "items": {"$ref": "#/definitions/dependency"}},
-    "provides": {"type": "array", "items": {"$ref": "#/definitions/provision"}},
-    "templates": {"type": "array", "items": {"$ref": "#/definitions/templateDependency"}},
-    "sharedResources": {"type": "array", "items": {"$ref": "#/definitions/sharedResource"}}
+    "$schema": {
+      "type": "string",
+      "enum": ["https://luhtech.dev/schemas/dependencies.json", "https://luhtech.dev/schemas/dependencies-v1.json"]
+    },
+    "version": {
+      "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/semver"
+    },
+    "ventureId": {
+      "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureIdPattern"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/dependency"}
+    },
+    "provides": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/provision"}
+    },
+    "templates": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/templateDependency"}
+    },
+    "sharedResources": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/sharedResource"}
+    }
   },
   "definitions": {
     "dependency": {
       "type": "object",
       "required": ["id", "type", "status"],
       "properties": {
-        "id": {"type": "string", "pattern": "^dep-[a-z0-9-]+$"},
-        "type": {"type": "string", "enum": ["venture", "template", "infrastructure", "api", "data", "team", "external"]},
-        "targetVentureId": {"type": ["string", "null"]},
-        "targetMilestone": {"type": ["string", "null"]},
-        "description": {"type": "string"},
-        "blocking": {"type": "boolean", "default": false},
-        "status": {"type": "string", "enum": ["pending", "in-progress", "satisfied", "at-risk", "blocked"]},
-        "requiredBy": {"type": ["string", "null"], "format": "date"},
-        "satisfiedOn": {"type": ["string", "null"], "format": "date"},
-        "quarter": {"type": ["string", "null"], "pattern": "^q[1-4]_20[0-9]{2}$"},
-        "impact": {"type": "string", "enum": ["critical", "high", "medium", "low"]},
-        "notes": {"type": "string"}
+        "id": {
+          "type": "string",
+          "pattern": "^dep-[a-z0-9-]+$"
+        },
+        "type": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/dependencyType"
+        },
+        "targetVentureId": {
+          "oneOf": [
+            {"$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureId"},
+            {"type": "null"}
+          ]
+        },
+        "targetMilestone": {
+          "type": ["string", "null"]
+        },
+        "description": {
+          "type": "string"
+        },
+        "blocking": {
+          "type": "boolean",
+          "default": false
+        },
+        "status": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/dependencyStatus"
+        },
+        "requiredBy": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "satisfiedOn": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "quarter": {
+          "oneOf": [
+            {"$ref": "https://luhtech.dev/schemas/enums.json#/definitions/quarter"},
+            {"type": "null"}
+          ]
+        },
+        "impact": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/impactLevel"
+        },
+        "notes": {
+          "type": "string"
+        }
       }
     },
     "provision": {
       "type": "object",
       "required": ["id", "type"],
       "properties": {
-        "id": {"type": "string", "pattern": "^prov-[a-z0-9-]+$"},
-        "type": {"type": "string", "enum": ["template", "api", "infrastructure", "data", "library"]},
-        "description": {"type": "string"},
-        "consumedBy": {"type": "array", "items": {"type": "string"}},
-        "availableFrom": {"type": ["string", "null"], "format": "date"},
-        "status": {"type": "string", "enum": ["planned", "in-development", "available", "deprecated"]}
+        "id": {
+          "type": "string",
+          "pattern": "^prov-[a-z0-9-]+$"
+        },
+        "type": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/provisionType"
+        },
+        "description": {
+          "type": "string"
+        },
+        "consumedBy": {
+          "type": "array",
+          "items": {
+            "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureId"
+          }
+        },
+        "availableFrom": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "status": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/provisionStatus"
+        }
       }
     },
     "templateDependency": {
       "type": "object",
       "required": ["templateId", "version"],
       "properties": {
-        "templateId": {"type": "string"},
-        "version": {"type": "string"},
-        "status": {"type": "string", "enum": ["waiting", "applied", "customized"]},
-        "appliedOn": {"type": ["string", "null"], "format": "date"},
-        "customizations": {"type": "array", "items": {"type": "string"}}
+        "templateId": {
+          "type": "string"
+        },
+        "version": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/semver"
+        },
+        "status": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/templateStatus"
+        },
+        "appliedOn": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "customizations": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
       }
     },
     "sharedResource": {
       "type": "object",
       "required": ["resourceId", "type"],
       "properties": {
-        "resourceId": {"type": "string"},
-        "type": {"type": "string", "enum": ["database", "api-gateway", "auth-service", "storage", "cdn", "ci-cd"]},
-        "owner": {"type": "string"},
-        "accessLevel": {"type": "string", "enum": ["read", "write", "admin"]},
-        "sharedWith": {"type": "array", "items": {"type": "string"}}
+        "resourceId": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/sharedResourceType"
+        },
+        "owner": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureId"
+        },
+        "accessLevel": {
+          "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/accessLevel"
+        },
+        "sharedWith": {
+          "type": "array",
+          "items": {
+            "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureId"
+          }
+        }
       }
     }
   }
