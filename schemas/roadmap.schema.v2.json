@@ -63,11 +63,7 @@
     }
   },
   "definitions": {
-    "_schemaRefs": {
-      "description": "External schema references for tooling. Validators should resolve these URIs.",
-      "enums": "https://luhtech.dev/schemas/enums.json",
-      "definitions": "https://luhtech.dev/schemas/definitions.json"
-    },
+ 
     "meta": {
       "type": "object",
       "description": "Document metadata",
