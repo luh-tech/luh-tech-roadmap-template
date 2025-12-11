@@ -67,6 +67,7 @@ jobs:
           
           SCHEMA_DIR="template/schemas"
           ROADMAP_DIR="venture/.roadmap"
+          ENUM_SCHEMA="$SCHEMA_DIR/_enums/luhtech-enums.schema.json"
           PASSED=0
           FAILED=0
           
@@ -75,9 +76,17 @@ jobs:
             exit 1
           fi
           
+          # Verify enum schema exists for $ref resolution
+          if [ ! -f "$ENUM_SCHEMA" ]; then
+            echo "::error::Enum schema not found at $ENUM_SCHEMA"
+            exit 1
+          fi
+          echo "✓ Enum schema found for \$ref resolution"
+          
           # roadmap.json (REQUIRED)
           if [ -f "$ROADMAP_DIR/roadmap.json" ]; then
-            if ajv validate -s "$SCHEMA_DIR/roadmap.schema.${{ inputs.schema-version }}.json" -d "$ROADMAP_DIR/roadmap.json" --spec=draft7 -c ajv-formats 2>/dev/null; then
+            echo "Validating roadmap.json..."
+            if ajv validate -s "$SCHEMA_DIR/roadmap.schema.${{ inputs.schema-version }}.json" -d "$ROADMAP_DIR/roadmap.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
               echo "✅ roadmap.json"; PASSED=$((PASSED + 1))
             else
               echo "❌ roadmap.json"; FAILED=$((FAILED + 1))
@@ -88,7 +97,8 @@ jobs:
           
           # venture-summary.json (REQUIRED)
           if [ -f "$ROADMAP_DIR/venture-summary.json" ]; then
-            if ajv validate -s "$SCHEMA_DIR/venture-summary.schema.json" -d "$ROADMAP_DIR/venture-summary.json" --spec=draft7 -c ajv-formats 2>/dev/null; then
+            echo "Validating venture-summary.json..."
+            if ajv validate -s "$SCHEMA_DIR/venture-summary.schema.json" -d "$ROADMAP_DIR/venture-summary.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
               echo "✅ venture-summary.json"; PASSED=$((PASSED + 1))
             else
               echo "❌ venture-summary.json"; FAILED=$((FAILED + 1))
@@ -99,7 +109,8 @@ jobs:
           
           # decision-log.json (OPTIONAL)
           if [ -f "$ROADMAP_DIR/decision-log.json" ]; then
-            if ajv validate -s "$SCHEMA_DIR/decision-log.schema.json" -d "$ROADMAP_DIR/decision-log.json" --spec=draft7 -c ajv-formats 2>/dev/null; then
+            echo "Validating decision-log.json..."
+            if ajv validate -s "$SCHEMA_DIR/decision-log.schema.json" -d "$ROADMAP_DIR/decision-log.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
               echo "✅ decision-log.json"; PASSED=$((PASSED + 1))
             else
               echo "❌ decision-log.json"; FAILED=$((FAILED + 1))
@@ -108,7 +119,8 @@ jobs:
           
           # dependencies.json (OPTIONAL)
           if [ -f "$ROADMAP_DIR/dependencies.json" ]; then
-            if ajv validate -s "$SCHEMA_DIR/dependencies.schema.json" -d "$ROADMAP_DIR/dependencies.json" --spec=draft7 -c ajv-formats 2>/dev/null; then
+            echo "Validating dependencies.json..."
+            if ajv validate -s "$SCHEMA_DIR/dependencies.schema.json" -d "$ROADMAP_DIR/dependencies.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
               echo "✅ dependencies.json"; PASSED=$((PASSED + 1))
             else
               echo "❌ dependencies.json"; FAILED=$((FAILED + 1))
@@ -117,7 +129,8 @@ jobs:
           
           # boundaries.json (OPTIONAL)
           if [ -f "$ROADMAP_DIR/boundaries.json" ]; then
-            if ajv validate -s "$SCHEMA_DIR/boundaries.schema.json" -d "$ROADMAP_DIR/boundaries.json" --spec=draft7 -c ajv-formats 2>/dev/null; then
+            echo "Validating boundaries.json..."
+            if ajv validate -s "$SCHEMA_DIR/boundaries.schema.json" -d "$ROADMAP_DIR/boundaries.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
               echo "✅ boundaries.json"; PASSED=$((PASSED + 1))
             else
               echo "❌ boundaries.json"; FAILED=$((FAILED + 1))
