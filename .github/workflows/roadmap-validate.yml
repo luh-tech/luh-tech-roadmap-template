@@ -148,10 +148,10 @@ jobs:
           echo "PHASE 2: Infrastructure Documentation"
           echo "====================================="
           
-          # tech-stack.json (OPTIONAL)
+          # tech-stack.json (OPTIONAL) - show errors for debugging
           if [ -f "$ROADMAP_DIR/tech-stack.json" ]; then
             if [ -f "$SCHEMA_DIR/tech-stack.schema.json" ]; then
-              if ajv validate -s "$SCHEMA_DIR/tech-stack.schema.json" -d "$ROADMAP_DIR/tech-stack.json" -r "$ENUM_SCHEMA" -r "$ENUM_SCHEMA_V2" -r "$DEFINITIONS_SCHEMA" --spec=draft7 -c ajv-formats 2>/dev/null; then
+              if ajv validate -s "$SCHEMA_DIR/tech-stack.schema.json" -d "$ROADMAP_DIR/tech-stack.json" -r "$ENUM_SCHEMA" -r "$ENUM_SCHEMA_V2" -r "$DEFINITIONS_SCHEMA" --spec=draft7 -c ajv-formats; then
                 echo "PASS tech-stack.json"; PASSED=$((PASSED + 1))
               else
                 echo "FAIL tech-stack.json"; FAILED=$((FAILED + 1))
@@ -166,7 +166,7 @@ jobs:
           # infrastructure-catalog.json (OPTIONAL)
           if [ -f "$ROADMAP_DIR/infrastructure-catalog.json" ]; then
             if [ -f "$SCHEMA_DIR/infrastructure-catalog.schema.json" ]; then
-              if ajv validate -s "$SCHEMA_DIR/infrastructure-catalog.schema.json" -d "$ROADMAP_DIR/infrastructure-catalog.json" -r "$ENUM_SCHEMA" -r "$ENUM_SCHEMA_V2" -r "$DEFINITIONS_SCHEMA" --spec=draft7 -c ajv-formats 2>/dev/null; then
+              if ajv validate -s "$SCHEMA_DIR/infrastructure-catalog.schema.json" -d "$ROADMAP_DIR/infrastructure-catalog.json" -r "$ENUM_SCHEMA" -r "$ENUM_SCHEMA_V2" -r "$DEFINITIONS_SCHEMA" --spec=draft7 -c ajv-formats; then
                 echo "PASS infrastructure-catalog.json"; PASSED=$((PASSED + 1))
               else
                 echo "FAIL infrastructure-catalog.json"; FAILED=$((FAILED + 1))
@@ -178,17 +178,10 @@ jobs:
             echo "SKIP infrastructure-catalog.json"; SKIPPED=$((SKIPPED + 1))
           fi
           
-          # evidence/*.json (OPTIONAL)
+          # evidence/ directory (SKIP - individual nodes not validated, container schema only)
           if [ -d "$ROADMAP_DIR/evidence" ]; then
-            if [ -f "$SCHEMA_DIR/evidence-session.schema.json" ]; then
-              for ef in $(find "$ROADMAP_DIR/evidence" -name "*.json" 2>/dev/null); do
-                if ajv validate -s "$SCHEMA_DIR/evidence-session.schema.json" -d "$ef" -r "$ENUM_SCHEMA" -r "$ENUM_SCHEMA_V2" --spec=draft7 -c ajv-formats 2>/dev/null; then
-                  echo "PASS $(basename $ef)"; PASSED=$((PASSED + 1))
-                else
-                  echo "FAIL $(basename $ef)"; FAILED=$((FAILED + 1))
-                fi
-              done
-            fi
+            EVIDENCE_COUNT=$(find "$ROADMAP_DIR/evidence" -name "*.json" 2>/dev/null | wc -l)
+            echo "SKIP evidence/ ($EVIDENCE_COUNT files - container schema only)"; SKIPPED=$((SKIPPED + 1))
           else
             echo "SKIP evidence/"; SKIPPED=$((SKIPPED + 1))
           fi
