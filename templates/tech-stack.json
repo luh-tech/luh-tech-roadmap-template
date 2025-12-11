@@ -1,0 +1,124 @@
+{
+  "$schema": "https://luhtech.dev/schemas/tech-stack-v1.json",
+  "version": "1.0.0",
+  "ventureId": "VENTURE_ID",
+  "lastUpdated": "2025-12-11T00:00:00Z",
+  "stack": {
+    "languages": [
+      {
+        "name": "TypeScript",
+        "version": "5.3",
+        "purpose": ["backend", "frontend"],
+        "primary": true,
+        "runtimeVersion": "Node.js 20 LTS"
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "Next.js",
+        "version": "14.x",
+        "category": "web-frontend",
+        "language": "TypeScript",
+        "license": "MIT",
+        "updatePolicy": "lts"
+      }
+    ],
+    "libraries": [
+      {
+        "name": "zod",
+        "version": "3.x",
+        "purpose": "Runtime validation",
+        "packageManager": "pnpm",
+        "critical": true
+      }
+    ],
+    "databases": [
+      {
+        "name": "PostgreSQL",
+        "type": "relational",
+        "engine": "postgresql",
+        "version": "15",
+        "hosted": true,
+        "provider": "Neon",
+        "orm": "Prisma"
+      }
+    ],
+    "infrastructure": [
+      {
+        "name": "Vercel",
+        "category": "compute",
+        "provider": "Vercel",
+        "purpose": "Frontend hosting and edge functions"
+      }
+    ],
+    "devTools": [
+      {
+        "name": "pnpm",
+        "version": "8.x",
+        "category": "package-manager",
+        "required": true
+      },
+      {
+        "name": "ESLint",
+        "version": "8.x",
+        "category": "linter",
+        "required": true,
+        "configFile": ".eslintrc.js"
+      },
+      {
+        "name": "Prettier",
+        "version": "3.x",
+        "category": "formatter",
+        "required": true,
+        "configFile": ".prettierrc"
+      }
+    ],
+    "thirdPartyServices": [],
+    "testing": [
+      {
+        "name": "Vitest",
+        "version": "1.x",
+        "type": "unit",
+        "coverage": true,
+        "ciIntegrated": true
+      }
+    ]
+  },
+  "architecturePatterns": [
+    {
+      "name": "api-first",
+      "description": "API-first design with OpenAPI specification",
+      "scope": "full-system"
+    }
+  ],
+  "codeReuse": {
+    "forkParent": null,
+    "sharedPercentage": 0,
+    "customizationAreas": [],
+    "syncStrategy": "none"
+  },
+  "standards": {
+    "styleguide": "LuhTech TypeScript Style Guide",
+    "linter": "ESLint",
+    "formatter": "Prettier",
+    "commitConvention": "conventional-commits",
+    "branchingStrategy": "github-flow",
+    "prRequirements": {
+      "reviewers": 1,
+      "ciPassing": true
+    }
+  },
+  "techDebt": [],
+  "migrationPlan": [],
+  "metrics": {
+    "dependencyCount": 0,
+    "outdatedDependencies": 0,
+    "securityVulnerabilities": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "testCoverage": 0
+  }
+}

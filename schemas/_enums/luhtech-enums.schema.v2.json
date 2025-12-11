@@ -1,0 +1,372 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/enums-v2.json",
+  "title": "LuhTech Shared Enumerations v2",
+  "description": "Centralized enumeration definitions for all LuhTech portfolio schemas including infrastructure, tech stack, and evidence systems. Single source of truth for consistent validation across all ventures.",
+  "definitions": {
+    "_metadata": {
+      "type": "object",
+      "description": "Schema metadata - not for validation",
+      "properties": {
+        "version": {"const": "2.0.0"},
+        "lastUpdated": {"const": "2025-12-11"},
+        "maintainer": {"const": "LuhTech Enterprise Infrastructure"}
+      }
+    },
+    "ventureId": {
+      "type": "string",
+      "description": "Canonical venture identifiers across the LuhTech portfolio",
+      "enum": ["ectropy", "jobsitecontrol", "hilja", "qullqa", "viiva", "raizal", "replique", "luhtech"]
+    },
+    "portfolioLayer": {
+      "type": "string",
+      "description": "Portfolio strategic layer classification",
+      "enum": ["flagship", "base-triad", "extension", "vendor", "independent", "holding"]
+    },
+    "documentStatus": {
+      "type": "string",
+      "description": "Document/roadmap lifecycle status",
+      "enum": ["active", "paused", "archived", "draft", "r&d", "planning", "pilot"]
+    },
+    "ventureStage": {
+      "type": "string",
+      "description": "Venture development/funding stage",
+      "enum": ["concept", "poc", "pre-seed", "seed", "series-a", "growth"]
+    },
+    "ventureType": {
+      "type": "string",
+      "description": "Primary venture business type",
+      "enum": ["Platform", "Hardware", "SaaS", "API", "Marketplace", "Holding"]
+    },
+    "architecture": {
+      "type": "string",
+      "description": "Technical architecture pattern",
+      "enum": ["Cloud-First", "Edge-First", "Hybrid", "API-Only", "Platform", "Edge + Cloud"]
+    },
+    "milestoneType": {
+      "type": "string",
+      "description": "Milestone category classification",
+      "enum": ["technical", "business", "funding", "team", "launch", "ar-milestone", "partnership", "ip"]
+    },
+    "milestoneStatus": {
+      "type": "string",
+      "description": "Timeline milestone completion status",
+      "enum": ["complete", "current", "planned"]
+    },
+    "deliverableStatus": {
+      "type": "string",
+      "description": "Deliverable/work item status",
+      "enum": ["planned", "in-progress", "complete", "blocked", "deferred"]
+    },
+    "featureStatus": {
+      "type": "string",
+      "description": "Feature development lifecycle status",
+      "enum": ["planned", "poc", "mvp", "beta", "commercial", "deprecated"]
+    },
+    "dependencyDirection": {
+      "type": "string",
+      "description": "Dependency relationship direction (roadmap context)",
+      "enum": ["upstream", "downstream", "cross-venture", "internal", "external"]
+    },
+    "dependencyType": {
+      "type": "string",
+      "description": "Dependency category type (dependencies schema)",
+      "enum": ["venture", "template", "infrastructure", "api", "data", "team", "external"]
+    },
+    "dependencyStatus": {
+      "type": "string",
+      "description": "Dependency resolution status",
+      "enum": ["pending", "in-progress", "satisfied", "at-risk", "blocked"]
+    },
+    "impactLevel": {
+      "type": "string",
+      "description": "Impact or severity level",
+      "enum": ["critical", "high", "medium", "low"]
+    },
+    "riskLevel": {
+      "type": "string",
+      "description": "Risk probability or impact assessment",
+      "enum": ["low", "medium", "medium-high", "high", "critical"]
+    },
+    "provisionType": {
+      "type": "string",
+      "description": "Provision/capability type offered",
+      "enum": ["template", "api", "infrastructure", "data", "library"]
+    },
+    "provisionStatus": {
+      "type": "string",
+      "description": "Provision availability status",
+      "enum": ["planned", "in-development", "available", "deprecated"]
+    },
+    "templateStatus": {
+      "type": "string",
+      "description": "Template application status",
+      "enum": ["waiting", "applied", "customized"]
+    },
+    "sharedResourceType": {
+      "type": "string",
+      "description": "Shared infrastructure resource type",
+      "enum": ["database", "api-gateway", "auth-service", "storage", "cdn", "ci-cd", "library"]
+    },
+    "accessLevel": {
+      "type": "string",
+      "description": "Resource access permission level",
+      "enum": ["read", "write", "admin"]
+    },
+    "fundingStatus": {
+      "type": "string",
+      "description": "Funding round status",
+      "enum": ["planning", "raising", "closing", "closed"]
+    },
+    "trend": {
+      "type": "string",
+      "description": "Metric trend direction",
+      "enum": ["up", "down", "flat"]
+    },
+    "relationshipType": {
+      "type": "string",
+      "description": "Stakeholder relationship category",
+      "enum": ["investor", "partner", "customer", "advisor", "founder-candidate", "vendor", "accelerator", "employee"]
+    },
+    "pipelineStage": {
+      "type": "string",
+      "description": "Dealflow/pipeline stage",
+      "enum": ["prospect", "contacted", "meeting", "due-diligence", "term-sheet", "closed-won", "closed-lost", "passed"]
+    },
+    "serviceStatus": {
+      "type": "string",
+      "description": "Service operational status",
+      "enum": ["operational", "degraded", "outage", "maintenance", "planned"]
+    },
+    "ipType": {
+      "type": "string",
+      "description": "Intellectual property type",
+      "enum": ["patent", "trademark", "copyright", "trade-secret"]
+    },
+    "ipStatus": {
+      "type": "string",
+      "description": "Intellectual property status",
+      "enum": ["filed", "pending", "granted", "active", "expired", "abandoned"]
+    },
+    "environmentType": {
+      "type": "string",
+      "description": "Deployment environment type",
+      "enum": ["development", "staging", "production", "preview", "testing", "local"]
+    },
+    "serviceType": {
+      "type": "string",
+      "description": "Infrastructure service type",
+      "enum": ["api", "web", "worker", "database", "cache", "queue", "proxy", "gateway", "mcp-server", "storage", "monitoring", "logging", "scheduler", "bim-viewer", "file-processor"]
+    },
+    "cloudProvider": {
+      "type": "string",
+      "description": "Cloud infrastructure provider",
+      "enum": ["digitalocean", "aws", "gcp", "azure", "vercel", "railway", "fly", "render", "heroku", "cloudflare", "self-hosted"]
+    },
+    "databaseEngine": {
+      "type": "string",
+      "description": "Database engine type",
+      "enum": ["postgresql", "mysql", "sqlite", "mongodb", "redis", "neo4j", "elasticsearch", "timescaledb", "cockroachdb", "supabase", "planetscale", "neon", "pinecone", "qdrant"]
+    },
+    "databaseType": {
+      "type": "string",
+      "description": "Database category",
+      "enum": ["relational", "document", "key-value", "graph", "time-series", "search", "vector"]
+    },
+    "envVariableCategory": {
+      "type": "string",
+      "description": "Environment variable category",
+      "enum": ["application", "database", "auth", "api", "storage", "monitoring", "feature-flag", "integration", "build"]
+    },
+    "envVariableScope": {
+      "type": "string",
+      "description": "Environment variable scope",
+      "enum": ["build-time", "runtime", "both"]
+    },
+    "secretScope": {
+      "type": "string",
+      "description": "Secret storage scope",
+      "enum": ["repository", "organization", "environment"]
+    },
+    "secretProvider": {
+      "type": "string",
+      "description": "Secret management provider",
+      "enum": ["github-secrets", "vault", "aws-secrets-manager", "doppler", "manual"]
+    },
+    "rotationFrequency": {
+      "type": "string",
+      "description": "Secret rotation frequency",
+      "enum": ["never", "weekly", "monthly", "quarterly", "annually"]
+    },
+    "workflowTrigger": {
+      "type": "string",
+      "description": "CI/CD workflow trigger type",
+      "enum": ["push", "pull_request", "workflow_dispatch", "schedule", "repository_dispatch", "release", "workflow_call"]
+    },
+    "deploymentFeature": {
+      "type": "string",
+      "description": "Deployment script feature",
+      "enum": ["health-check", "rollback", "backup", "blue-green", "canary", "zero-downtime", "database-migration", "ssh-key-cleanup"]
+    },
+    "dockerComposePurpose": {
+      "type": "string",
+      "description": "Docker Compose file purpose",
+      "enum": ["development", "testing", "production", "ci", "base", "override"]
+    },
+    "externalServiceCategory": {
+      "type": "string",
+      "description": "Third-party service category",
+      "enum": ["auth", "storage", "email", "analytics", "monitoring", "payment", "messaging", "ai", "bim", "cdn", "dns", "ci-cd", "error-tracking", "feature-flags"]
+    },
+    "languageName": {
+      "type": "string",
+      "description": "Programming language",
+      "enum": ["TypeScript", "JavaScript", "Python", "Rust", "Go", "Java", "C#", "C++", "Swift", "Kotlin", "Ruby", "PHP", "SQL", "GraphQL", "HTML", "CSS", "SCSS", "Shell", "Dockerfile"]
+    },
+    "languagePurpose": {
+      "type": "string",
+      "description": "Programming language purpose",
+      "enum": ["backend", "frontend", "api", "scripting", "data", "infrastructure", "testing", "mobile", "embedded"]
+    },
+    "frameworkCategory": {
+      "type": "string",
+      "description": "Framework category",
+      "enum": ["web-frontend", "web-backend", "api", "mobile", "desktop", "testing", "data", "ml-ai", "cli", "orm", "validation", "state-management", "ui-components"]
+    },
+    "packageManager": {
+      "type": "string",
+      "description": "Package manager",
+      "enum": ["npm", "yarn", "pnpm", "pip", "poetry", "cargo", "go-mod", "maven", "gradle", "nuget"]
+    },
+    "devToolCategory": {
+      "type": "string",
+      "description": "Development tool category",
+      "enum": ["package-manager", "build-tool", "bundler", "linter", "formatter", "type-checker", "debugger", "profiler", "ide", "version-control", "documentation", "api-client", "monorepo"]
+    },
+    "testingType": {
+      "type": "string",
+      "description": "Testing type",
+      "enum": ["unit", "integration", "e2e", "visual", "performance", "security", "accessibility", "contract", "mutation"]
+    },
+    "architecturePattern": {
+      "type": "string",
+      "description": "Software architecture pattern",
+      "enum": ["monolith", "microservices", "serverless", "event-driven", "cqrs", "hexagonal", "clean-architecture", "domain-driven", "modular-monolith", "jamstack", "spa", "ssr", "ssg", "hybrid-rendering", "api-first", "graphql-federation", "mcp-server"]
+    },
+    "monorepoTool": {
+      "type": "string",
+      "description": "Monorepo management tool",
+      "enum": ["nx", "turborepo", "lerna", "rush", "pnpm-workspaces", "yarn-workspaces", "none"]
+    },
+    "commitConvention": {
+      "type": "string",
+      "description": "Git commit convention",
+      "enum": ["conventional-commits", "angular", "gitmoji", "custom", "none"]
+    },
+    "branchingStrategy": {
+      "type": "string",
+      "description": "Git branching strategy",
+      "enum": ["gitflow", "github-flow", "trunk-based", "custom"]
+    },
+    "evidenceNodeType": {
+      "type": "string",
+      "description": "Evidence session node type",
+      "enum": ["investigation", "deliverable", "milestone", "evidence", "decision", "incident", "retrospective", "spike", "poc", "research"]
+    },
+    "evidenceStatus": {
+      "type": "string",
+      "description": "Evidence session status",
+      "enum": ["planned", "in-progress", "completed", "blocked", "cancelled", "archived"]
+    },
+    "evidenceCategory": {
+      "type": "string",
+      "description": "Evidence session category",
+      "enum": ["infrastructure", "architecture", "security", "performance", "debugging", "deployment", "integration", "testing", "documentation", "research", "planning", "review"]
+    },
+    "incidentSeverity": {
+      "type": "string",
+      "description": "Incident severity level",
+      "enum": ["critical", "major", "minor", "cosmetic"]
+    },
+    "decisionStatus": {
+      "type": "string",
+      "description": "Decision lifecycle status",
+      "enum": ["proposed", "approved", "implemented", "superseded", "rejected", "deferred"]
+    },
+    "decisionCategory": {
+      "type": "string",
+      "description": "Decision category",
+      "enum": ["architecture", "infrastructure", "api-design", "security", "governance", "business", "product", "team", "funding", "legal", "vendor", "process", "tooling"]
+    },
+    "voteType": {
+      "type": "string",
+      "description": "Decision vote type",
+      "enum": ["approve", "reject", "abstain", "request-changes"]
+    },
+    "noteType": {
+      "type": "string",
+      "description": "Decision note type",
+      "enum": ["comment", "update", "review", "concern", "resolution"]
+    },
+    "quarter": {
+      "type": "string",
+      "description": "Quarter identifier pattern",
+      "pattern": "^q[1-4]_20[0-9]{2}$"
+    },
+    "semver": {
+      "type": "string",
+      "description": "Semantic version string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "ventureIdPattern": {
+      "type": "string",
+      "description": "Valid venture ID format (lowercase, hyphenated)",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "hexColor": {
+      "type": "string",
+      "description": "Hex color code",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
+    },
+    "decisionIdPattern": {
+      "type": "string",
+      "description": "Decision ID pattern",
+      "pattern": "^d-\\d{4}-\\d{2}-\\d{2}-[a-z0-9-]+$"
+    },
+    "nodeIdPattern": {
+      "type": "string",
+      "description": "Evidence node ID pattern",
+      "pattern": "^node-[a-z0-9-]+-\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "serviceIdPattern": {
+      "type": "string",
+      "description": "Service ID pattern",
+      "pattern": "^service-[a-z][a-z0-9-]*$"
+    },
+    "environmentIdPattern": {
+      "type": "string",
+      "description": "Environment ID pattern",
+      "pattern": "^env-[a-z][a-z0-9-]*$"
+    },
+    "serverIdPattern": {
+      "type": "string",
+      "description": "Server ID pattern",
+      "pattern": "^server-[a-z][a-z0-9-]*$"
+    },
+    "databaseIdPattern": {
+      "type": "string",
+      "description": "Database ID pattern",
+      "pattern": "^db-[a-z][a-z0-9-]*$"
+    },
+    "externalServiceIdPattern": {
+      "type": "string",
+      "description": "External service ID pattern",
+      "pattern": "^ext-[a-z][a-z0-9-]*$"
+    },
+    "envVariablePattern": {
+      "type": "string",
+      "description": "Environment variable name pattern (SCREAMING_SNAKE_CASE)",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    }
+  }
+}

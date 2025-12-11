@@ -1,0 +1,792 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/infrastructure-catalog-v1.json",
+  "title": "Infrastructure Catalog",
+  "description": "Standardized infrastructure documentation for LuhTech ventures. Provides service registry, environment configuration, secrets management, workflow documentation, and deployment specifications. Derived from Ectropy production infrastructure (202KB, v2.12.0).",
+  "type": "object",
+  "required": ["$schema", "version", "ventureId", "lastUpdated", "catalog"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://luhtech.dev/schemas/infrastructure-catalog-v1.json"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Catalog version (semver)"
+    },
+    "ventureId": {
+      "$ref": "./_enums/luhtech-enums.schema.json#/definitions/ventureId"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last modification timestamp"
+    },
+    "catalog": {
+      "type": "object",
+      "required": ["environments", "services"],
+      "additionalProperties": false,
+      "properties": {
+        "environments": {
+          "type": "array",
+          "description": "Deployment environments",
+          "items": {"$ref": "#/definitions/environment"},
+          "minItems": 1
+        },
+        "services": {
+          "type": "array",
+          "description": "Service definitions",
+          "items": {"$ref": "#/definitions/service"}
+        },
+        "ports": {
+          "type": "object",
+          "description": "Port allocation matrix by service",
+          "additionalProperties": {"$ref": "#/definitions/portAllocation"}
+        },
+        "environmentVariables": {
+          "type": "array",
+          "description": "Environment variable definitions",
+          "items": {"$ref": "#/definitions/envVariable"}
+        },
+        "secrets": {
+          "type": "array",
+          "description": "Secret definitions with rotation policies",
+          "items": {"$ref": "#/definitions/secret"}
+        },
+        "workflows": {
+          "type": "array",
+          "description": "CI/CD workflow definitions",
+          "items": {"$ref": "#/definitions/workflow"}
+        },
+        "compositeActions": {
+          "type": "array",
+          "description": "Reusable GitHub Actions",
+          "items": {"$ref": "#/definitions/compositeAction"}
+        },
+        "deploymentScripts": {
+          "type": "array",
+          "description": "Deployment script specifications",
+          "items": {"$ref": "#/definitions/deploymentScript"}
+        },
+        "dockerCompose": {
+          "type": "array",
+          "description": "Docker Compose file inventory",
+          "items": {"$ref": "#/definitions/dockerComposeFile"}
+        },
+        "databases": {
+          "type": "array",
+          "description": "Database configurations",
+          "items": {"$ref": "#/definitions/database"}
+        },
+        "externalServices": {
+          "type": "array",
+          "description": "Third-party service integrations",
+          "items": {"$ref": "#/definitions/externalService"}
+        }
+      }
+    },
+    "auditTrail": {
+      "type": "array",
+      "description": "Version history and changes",
+      "items": {"$ref": "#/definitions/auditEntry"}
+    },
+    "notes": {
+      "type": "array",
+      "description": "Infrastructure notes and annotations",
+      "items": {"$ref": "./_definitions/definitions.schema.json#/definitions/note"}
+    }
+  },
+  "definitions": {
+    "environment": {
+      "type": "object",
+      "description": "Deployment environment definition",
+      "required": ["id", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^env-[a-z][a-z0-9-]*$",
+          "description": "Environment identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["development", "staging", "production", "preview", "testing"],
+          "description": "Environment type"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Environment URL"
+        },
+        "servers": {
+          "type": "array",
+          "description": "Associated server configurations",
+          "items": {"$ref": "#/definitions/server"}
+        },
+        "features": {
+          "type": "object",
+          "description": "Environment-specific feature flags",
+          "additionalProperties": {"type": "boolean"}
+        },
+        "notes": {
+          "type": "string",
+          "description": "Environment notes"
+        }
+      }
+    },
+    "server": {
+      "type": "object",
+      "description": "Server configuration",
+      "required": ["id", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^server-[a-z][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string",
+          "enum": ["digitalocean", "aws", "gcp", "azure", "vercel", "railway", "fly", "render", "self-hosted"],
+          "description": "Cloud provider"
+        },
+        "region": {
+          "type": "string",
+          "description": "Deployment region"
+        },
+        "specs": {
+          "type": "object",
+          "properties": {
+            "cpu": {"type": "string"},
+            "memory": {"type": "string"},
+            "storage": {"type": "string"},
+            "os": {"type": "string"}
+          }
+        },
+        "ip": {
+          "type": "string",
+          "description": "IP address (for documentation only)"
+        },
+        "sshConfig": {
+          "type": "object",
+          "properties": {
+            "user": {"type": "string"},
+            "keyRef": {"type": "string", "description": "Reference to SSH key secret"}
+          }
+        },
+        "services": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Service IDs deployed on this server"
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "description": "Service definition",
+      "required": ["id", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^service-[a-z][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "api",
+            "web",
+            "worker",
+            "database",
+            "cache",
+            "queue",
+            "proxy",
+            "gateway",
+            "mcp-server",
+            "storage",
+            "monitoring",
+            "logging",
+            "scheduler",
+            "bim-viewer",
+            "file-processor"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "repository": {
+          "type": "string",
+          "description": "Source repository path"
+        },
+        "containerImage": {
+          "type": "string",
+          "description": "Docker image reference"
+        },
+        "ports": {
+          "type": "object",
+          "properties": {
+            "internal": {"type": "integer"},
+            "external": {"type": "integer"},
+            "health": {"type": "integer"}
+          }
+        },
+        "healthCheck": {
+          "$ref": "#/definitions/healthCheck"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Service IDs this service depends on"
+        },
+        "environment": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Required environment variable names"
+        },
+        "volumes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "path": {"type": "string"},
+              "type": {"type": "string", "enum": ["persistent", "config", "secret", "temp"]}
+            }
+          }
+        },
+        "scaling": {
+          "type": "object",
+          "properties": {
+            "minReplicas": {"type": "integer", "minimum": 0},
+            "maxReplicas": {"type": "integer", "minimum": 1},
+            "targetCPU": {"type": "integer", "minimum": 1, "maximum": 100}
+          }
+        },
+        "status": {
+          "$ref": "./_enums/luhtech-enums.schema.json#/definitions/serviceStatus"
+        }
+      }
+    },
+    "healthCheck": {
+      "type": "object",
+      "description": "Service health check configuration",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "Health check endpoint path"
+        },
+        "interval": {
+          "type": "string",
+          "description": "Check interval (e.g., '30s', '1m')"
+        },
+        "timeout": {
+          "type": "string",
+          "description": "Timeout duration"
+        },
+        "retries": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "startPeriod": {
+          "type": "string",
+          "description": "Initial startup grace period"
+        }
+      }
+    },
+    "portAllocation": {
+      "type": "object",
+      "description": "Port allocation across environments",
+      "properties": {
+        "development": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "staging": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "production": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "description": {
+          "type": "string"
+        },
+        "protocol": {
+          "type": "string",
+          "enum": ["tcp", "udp", "http", "https", "grpc"],
+          "default": "tcp"
+        }
+      }
+    },
+    "envVariable": {
+      "type": "object",
+      "description": "Environment variable definition",
+      "required": ["name", "category"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "description": "Variable name (SCREAMING_SNAKE_CASE)"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "application",
+            "database",
+            "auth",
+            "api",
+            "storage",
+            "monitoring",
+            "feature-flag",
+            "integration",
+            "build"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "enum": ["build-time", "runtime", "both"],
+          "default": "runtime"
+        },
+        "required": {
+          "type": "boolean",
+          "default": true
+        },
+        "sensitive": {
+          "type": "boolean",
+          "default": false,
+          "description": "Contains PII or secrets"
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "Default value (never store actual secrets)"
+        },
+        "description": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Services that use this variable"
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "pattern": {"type": "string"},
+            "enum": {"type": "array", "items": {"type": "string"}},
+            "minLength": {"type": "integer"},
+            "maxLength": {"type": "integer"}
+          }
+        }
+      }
+    },
+    "secret": {
+      "type": "object",
+      "description": "Secret definition (no actual values stored)",
+      "required": ["name", "scope"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "scope": {
+          "type": "string",
+          "enum": ["repository", "organization", "environment"],
+          "description": "GitHub secret scope"
+        },
+        "environments": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Environments where secret is available"
+        },
+        "rotationPolicy": {
+          "type": "object",
+          "properties": {
+            "frequency": {
+              "type": "string",
+              "enum": ["never", "monthly", "quarterly", "annually"],
+              "default": "quarterly"
+            },
+            "lastRotated": {
+              "type": "string",
+              "format": "date"
+            },
+            "nextRotation": {
+              "type": "string",
+              "format": "date"
+            },
+            "autoRotate": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "provider": {
+          "type": "string",
+          "enum": ["github-secrets", "vault", "aws-secrets-manager", "doppler", "manual"],
+          "default": "github-secrets"
+        },
+        "description": {
+          "type": "string"
+        },
+        "usedBy": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Workflow or service references"
+        }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "description": "CI/CD workflow definition",
+      "required": ["name", "file"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string",
+          "description": "Workflow file path (e.g., '.github/workflows/ci.yml')"
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "push",
+              "pull_request",
+              "workflow_dispatch",
+              "schedule",
+              "repository_dispatch",
+              "release",
+              "workflow_call"
+            ]
+          }
+        },
+        "branches": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Branch filters"
+        },
+        "paths": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Path filters"
+        },
+        "maturity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4,
+          "description": "Maturity rating (1-4 stars)"
+        },
+        "description": {
+          "type": "string"
+        },
+        "jobs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "runsOn": {"type": "string"},
+              "steps": {"type": "integer"}
+            }
+          }
+        },
+        "secrets": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Required secret names"
+        },
+        "permissions": {
+          "type": "object",
+          "description": "Required GitHub permissions",
+          "additionalProperties": {
+            "type": "string",
+            "enum": ["read", "write", "none"]
+          }
+        },
+        "estimatedDuration": {
+          "type": "string",
+          "description": "Typical run duration"
+        }
+      }
+    },
+    "compositeAction": {
+      "type": "object",
+      "description": "Reusable GitHub Action",
+      "required": ["name", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string",
+          "description": "Action path (e.g., '.github/actions/setup-node')"
+        },
+        "description": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "required": {"type": "boolean"},
+              "default": {"type": "string"},
+              "description": {"type": "string"}
+            }
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "description": {"type": "string"}
+            }
+          }
+        },
+        "usedBy": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Workflows that use this action"
+        }
+      }
+    },
+    "deploymentScript": {
+      "type": "object",
+      "description": "Deployment script specification",
+      "required": ["name", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "targetEnvironment": {
+          "type": "string",
+          "enum": ["development", "staging", "production", "all"]
+        },
+        "preConditions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Required conditions before execution"
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "health-check",
+              "rollback",
+              "backup",
+              "blue-green",
+              "canary",
+              "zero-downtime",
+              "database-migration",
+              "ssh-key-cleanup"
+            ]
+          }
+        },
+        "estimatedDuration": {
+          "type": "string"
+        },
+        "riskLevel": {
+          "$ref": "./_enums/luhtech-enums.schema.json#/definitions/riskLevel"
+        }
+      }
+    },
+    "dockerComposeFile": {
+      "type": "object",
+      "description": "Docker Compose file specification",
+      "required": ["name", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string",
+          "enum": ["development", "testing", "production", "ci", "base", "override"]
+        },
+        "services": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Service IDs defined in this file"
+        },
+        "networks": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "volumes": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "extends": {
+          "type": "string",
+          "description": "Parent compose file path"
+        }
+      }
+    },
+    "database": {
+      "type": "object",
+      "description": "Database configuration",
+      "required": ["id", "name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^db-[a-z][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["postgresql", "mysql", "mongodb", "redis", "sqlite", "neo4j", "elasticsearch"]
+        },
+        "version": {
+          "type": "string"
+        },
+        "hosted": {
+          "type": "boolean",
+          "description": "Managed service vs self-hosted"
+        },
+        "provider": {
+          "type": "string",
+          "description": "Hosting provider if managed"
+        },
+        "connectionStringRef": {
+          "type": "string",
+          "description": "Environment variable containing connection string"
+        },
+        "backupPolicy": {
+          "type": "object",
+          "properties": {
+            "frequency": {"type": "string"},
+            "retention": {"type": "string"},
+            "location": {"type": "string"}
+          }
+        },
+        "extensions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Database extensions (e.g., PostGIS, pgvector)"
+        }
+      }
+    },
+    "externalService": {
+      "type": "object",
+      "description": "Third-party service integration",
+      "required": ["id", "name", "category"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^ext-[a-z][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "auth",
+            "storage",
+            "email",
+            "analytics",
+            "monitoring",
+            "payment",
+            "messaging",
+            "ai",
+            "bim",
+            "cdn",
+            "dns",
+            "ci-cd"
+          ]
+        },
+        "provider": {
+          "type": "string"
+        },
+        "apiVersion": {
+          "type": "string"
+        },
+        "documentation": {
+          "type": "string",
+          "format": "uri"
+        },
+        "pricing": {
+          "type": "string",
+          "enum": ["free", "freemium", "paid", "enterprise"],
+          "description": "Pricing tier"
+        },
+        "credentialRefs": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Secret names for credentials"
+        }
+      }
+    },
+    "auditEntry": {
+      "type": "object",
+      "description": "Catalog version audit entry",
+      "required": ["timestamp", "version", "author"],
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "author": {
+          "type": "string"
+        },
+        "changes": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Summary of changes"
+        },
+        "relatedPRs": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "relatedIssues": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    }
+  }
+}

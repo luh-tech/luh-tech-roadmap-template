@@ -1,0 +1,46 @@
+{
+  "$schema": "https://luhtech.dev/schemas/evidence-session-v1.json",
+  "version": "1.0.0",
+  "ventureId": "VENTURE_ID",
+  "lastUpdated": "2025-12-11T00:00:00Z",
+  "sessions": [],
+  "indexes": {
+    "byStatus": {},
+    "byCategory": {},
+    "byPhase": {},
+    "byNodeType": {},
+    "byQuarter": {}
+  },
+  "retentionConfig": {
+    "policies": [
+      {
+        "category": "infrastructure",
+        "retentionDays": 365,
+        "rationale": "Infrastructure decisions need long-term reference"
+      },
+      {
+        "category": "security",
+        "retentionDays": 365,
+        "rationale": "Security evidence for compliance"
+      },
+      {
+        "category": "debugging",
+        "retentionDays": 90,
+        "rationale": "Debugging sessions less critical long-term"
+      },
+      {
+        "category": "research",
+        "retentionDays": 180,
+        "rationale": "Research remains useful for moderate period"
+      }
+    ],
+    "defaultRetentionDays": 90,
+    "autoArchive": true
+  },
+  "stats": {
+    "totalSessions": 0,
+    "activeCount": 0,
+    "completedCount": 0,
+    "archivedCount": 0
+  }
+}

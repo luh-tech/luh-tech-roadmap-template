@@ -1,0 +1,122 @@
+{
+  "$schema": "https://luhtech.dev/schemas/infrastructure-catalog-v1.json",
+  "version": "1.0.0",
+  "ventureId": "VENTURE_ID",
+  "lastUpdated": "2025-12-11T00:00:00Z",
+  "catalog": {
+    "environments": [
+      {
+        "id": "env-development",
+        "name": "Development",
+        "type": "development",
+        "url": "http://localhost:3000",
+        "notes": "Local development environment"
+      },
+      {
+        "id": "env-staging",
+        "name": "Staging",
+        "type": "staging",
+        "url": "https://staging.VENTURE.dev",
+        "notes": "Pre-production testing environment"
+      },
+      {
+        "id": "env-production",
+        "name": "Production",
+        "type": "production",
+        "url": "https://VENTURE.dev",
+        "notes": "Production environment"
+      }
+    ],
+    "services": [
+      {
+        "id": "service-api",
+        "name": "API Server",
+        "type": "api",
+        "description": "Main API server",
+        "repository": "apps/api",
+        "ports": {
+          "internal": 3000,
+          "external": 3000
+        },
+        "healthCheck": {
+          "endpoint": "/health",
+          "interval": "30s",
+          "timeout": "10s",
+          "retries": 3
+        },
+        "dependencies": [],
+        "status": "operational"
+      }
+    ],
+    "ports": {
+      "api": {
+        "development": 3000,
+        "staging": 3000,
+        "production": 3000,
+        "description": "API Server",
+        "protocol": "http"
+      }
+    },
+    "environmentVariables": [
+      {
+        "name": "NODE_ENV",
+        "category": "application",
+        "scope": "runtime",
+        "required": true,
+        "sensitive": false,
+        "defaultValue": "development",
+        "description": "Node.js environment"
+      },
+      {
+        "name": "DATABASE_URL",
+        "category": "database",
+        "scope": "runtime",
+        "required": true,
+        "sensitive": true,
+        "description": "PostgreSQL connection string"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "DATABASE_URL",
+        "scope": "repository",
+        "environments": ["staging", "production"],
+        "rotationPolicy": {
+          "frequency": "quarterly",
+          "autoRotate": false
+        },
+        "provider": "github-secrets",
+        "description": "Database connection string"
+      }
+    ],
+    "workflows": [
+      {
+        "name": "CI Pipeline",
+        "file": ".github/workflows/ci.yml",
+        "triggers": ["push", "pull_request"],
+        "branches": ["main", "develop"],
+        "maturity": 3,
+        "description": "Continuous integration pipeline"
+      }
+    ],
+    "databases": [
+      {
+        "id": "db-primary",
+        "name": "Primary Database",
+        "type": "postgresql",
+        "version": "15",
+        "hosted": true,
+        "provider": "Neon",
+        "connectionStringRef": "DATABASE_URL"
+      }
+    ]
+  },
+  "auditTrail": [
+    {
+      "timestamp": "2025-12-11T00:00:00Z",
+      "version": "1.0.0",
+      "author": "AUTHOR",
+      "changes": ["Initial infrastructure catalog creation"]
+    }
+  ]
+}
