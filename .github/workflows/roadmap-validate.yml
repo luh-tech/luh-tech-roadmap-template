@@ -63,33 +63,38 @@ jobs:
       - name: Validate Roadmap Files
         id: validate-files
         run: |
-          echo "🔍 Validating .roadmap/ for venture: ${{ inputs.venture-id }}"
+          echo "Validating .roadmap/ for venture: ${{ inputs.venture-id }}"
           
           SCHEMA_DIR="template/schemas"
           ROADMAP_DIR="venture/.roadmap"
           ENUM_SCHEMA="$SCHEMA_DIR/_enums/luhtech-enums.schema.json"
+          ENUM_SCHEMA_V2="$SCHEMA_DIR/_enums/luhtech-enums.schema.v2.json"
+          DEFINITIONS_SCHEMA="$SCHEMA_DIR/_definitions/definitions.schema.json"
+          
           PASSED=0
           FAILED=0
+          SKIPPED=0
           
           if [ ! -d "$ROADMAP_DIR" ]; then
             echo "::error::.roadmap/ directory not found"
             exit 1
           fi
           
-          # Verify enum schema exists for $ref resolution
           if [ ! -f "$ENUM_SCHEMA" ]; then
-            echo "::error::Enum schema not found at $ENUM_SCHEMA"
+            echo "::error::Enum schema v1 not found"
             exit 1
           fi
-          echo "✓ Enum schema found for \$ref resolution"
+          
+          echo ""
+          echo "PHASE 1: Core Roadmap Files"
+          echo "==========================="
           
           # roadmap.json (REQUIRED)
           if [ -f "$ROADMAP_DIR/roadmap.json" ]; then
-            echo "Validating roadmap.json..."
             if ajv validate -s "$SCHEMA_DIR/roadmap.schema.${{ inputs.schema-version }}.json" -d "$ROADMAP_DIR/roadmap.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
-              echo "✅ roadmap.json"; PASSED=$((PASSED + 1))
+              echo "PASS roadmap.json"; PASSED=$((PASSED + 1))
             else
-              echo "❌ roadmap.json"; FAILED=$((FAILED + 1))
+              echo "FAIL roadmap.json"; FAILED=$((FAILED + 1))
             fi
           else
             echo "::error::roadmap.json required"; FAILED=$((FAILED + 1))
@@ -97,11 +102,10 @@ jobs:
           
           # venture-summary.json (REQUIRED)
           if [ -f "$ROADMAP_DIR/venture-summary.json" ]; then
-            echo "Validating venture-summary.json..."
             if ajv validate -s "$SCHEMA_DIR/venture-summary.schema.json" -d "$ROADMAP_DIR/venture-summary.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
-              echo "✅ venture-summary.json"; PASSED=$((PASSED + 1))
+              echo "PASS venture-summary.json"; PASSED=$((PASSED + 1))
             else
-              echo "❌ venture-summary.json"; FAILED=$((FAILED + 1))
+              echo "FAIL venture-summary.json"; FAILED=$((FAILED + 1))
             fi
           else
             echo "::error::venture-summary.json required"; FAILED=$((FAILED + 1))
@@ -109,40 +113,94 @@ jobs:
           
           # decision-log.json (OPTIONAL)
           if [ -f "$ROADMAP_DIR/decision-log.json" ]; then
-            echo "Validating decision-log.json..."
             if ajv validate -s "$SCHEMA_DIR/decision-log.schema.json" -d "$ROADMAP_DIR/decision-log.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
-              echo "✅ decision-log.json"; PASSED=$((PASSED + 1))
+              echo "PASS decision-log.json"; PASSED=$((PASSED + 1))
             else
-              echo "❌ decision-log.json"; FAILED=$((FAILED + 1))
+              echo "FAIL decision-log.json"; FAILED=$((FAILED + 1))
             fi
+          else
+            echo "SKIP decision-log.json"; SKIPPED=$((SKIPPED + 1))
           fi
           
           # dependencies.json (OPTIONAL)
           if [ -f "$ROADMAP_DIR/dependencies.json" ]; then
-            echo "Validating dependencies.json..."
             if ajv validate -s "$SCHEMA_DIR/dependencies.schema.json" -d "$ROADMAP_DIR/dependencies.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
-              echo "✅ dependencies.json"; PASSED=$((PASSED + 1))
+              echo "PASS dependencies.json"; PASSED=$((PASSED + 1))
             else
-              echo "❌ dependencies.json"; FAILED=$((FAILED + 1))
+              echo "FAIL dependencies.json"; FAILED=$((FAILED + 1))
             fi
+          else
+            echo "SKIP dependencies.json"; SKIPPED=$((SKIPPED + 1))
           fi
           
           # boundaries.json (OPTIONAL)
           if [ -f "$ROADMAP_DIR/boundaries.json" ]; then
-            echo "Validating boundaries.json..."
             if ajv validate -s "$SCHEMA_DIR/boundaries.schema.json" -d "$ROADMAP_DIR/boundaries.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
-              echo "✅ boundaries.json"; PASSED=$((PASSED + 1))
+              echo "PASS boundaries.json"; PASSED=$((PASSED + 1))
             else
-              echo "❌ boundaries.json"; FAILED=$((FAILED + 1))
+              echo "FAIL boundaries.json"; FAILED=$((FAILED + 1))
             fi
+          else
+            echo "SKIP boundaries.json"; SKIPPED=$((SKIPPED + 1))
           fi
           
-          echo "📊 Results: $PASSED passed, $FAILED failed"
+          echo ""
+          echo "PHASE 2: Infrastructure Documentation"
+          echo "====================================="
+          
+          # tech-stack.json (OPTIONAL)
+          if [ -f "$ROADMAP_DIR/tech-stack.json" ]; then
+            if [ -f "$SCHEMA_DIR/tech-stack.schema.json" ]; then
+              if ajv validate -s "$SCHEMA_DIR/tech-stack.schema.json" -d "$ROADMAP_DIR/tech-stack.json" -r "$ENUM_SCHEMA" -r "$ENUM_SCHEMA_V2" -r "$DEFINITIONS_SCHEMA" --spec=draft7 -c ajv-formats 2>/dev/null; then
+                echo "PASS tech-stack.json"; PASSED=$((PASSED + 1))
+              else
+                echo "FAIL tech-stack.json"; FAILED=$((FAILED + 1))
+              fi
+            else
+              echo "SKIP tech-stack.json (schema missing)"; SKIPPED=$((SKIPPED + 1))
+            fi
+          else
+            echo "SKIP tech-stack.json"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
+          # infrastructure-catalog.json (OPTIONAL)
+          if [ -f "$ROADMAP_DIR/infrastructure-catalog.json" ]; then
+            if [ -f "$SCHEMA_DIR/infrastructure-catalog.schema.json" ]; then
+              if ajv validate -s "$SCHEMA_DIR/infrastructure-catalog.schema.json" -d "$ROADMAP_DIR/infrastructure-catalog.json" -r "$ENUM_SCHEMA" -r "$ENUM_SCHEMA_V2" -r "$DEFINITIONS_SCHEMA" --spec=draft7 -c ajv-formats 2>/dev/null; then
+                echo "PASS infrastructure-catalog.json"; PASSED=$((PASSED + 1))
+              else
+                echo "FAIL infrastructure-catalog.json"; FAILED=$((FAILED + 1))
+              fi
+            else
+              echo "SKIP infrastructure-catalog.json (schema missing)"; SKIPPED=$((SKIPPED + 1))
+            fi
+          else
+            echo "SKIP infrastructure-catalog.json"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
+          # evidence/*.json (OPTIONAL)
+          if [ -d "$ROADMAP_DIR/evidence" ]; then
+            if [ -f "$SCHEMA_DIR/evidence-session.schema.json" ]; then
+              for ef in $(find "$ROADMAP_DIR/evidence" -name "*.json" 2>/dev/null); do
+                if ajv validate -s "$SCHEMA_DIR/evidence-session.schema.json" -d "$ef" -r "$ENUM_SCHEMA" -r "$ENUM_SCHEMA_V2" --spec=draft7 -c ajv-formats 2>/dev/null; then
+                  echo "PASS $(basename $ef)"; PASSED=$((PASSED + 1))
+                else
+                  echo "FAIL $(basename $ef)"; FAILED=$((FAILED + 1))
+                fi
+              done
+            fi
+          else
+            echo "SKIP evidence/"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
+          echo ""
+          echo "Results: $PASSED passed, $FAILED failed, $SKIPPED skipped"
+          
           echo "passed=$PASSED" >> $GITHUB_OUTPUT
           echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
           
           if [ $FAILED -gt 0 ]; then
-            echo "::error::Validation failed"
             exit 1
           fi
 
@@ -150,10 +208,20 @@ jobs:
         id: summary
         if: always()
         run: |
+          PASSED="${{ steps.validate-files.outputs.passed || '0' }}"
           FAILED="${{ steps.validate-files.outputs.failed || '0' }}"
+          SKIPPED="${{ steps.validate-files.outputs.skipped || '0' }}"
+          
           if [ "$FAILED" == "0" ]; then
             echo "result=pass" >> $GITHUB_OUTPUT
           else
             echo "result=fail" >> $GITHUB_OUTPUT
           fi
-          echo "file-count=${{ steps.validate-files.outputs.passed || '0' }}" >> $GITHUB_OUTPUT
+          echo "file-count=$PASSED" >> $GITHUB_OUTPUT
+          
+          echo "## Roadmap Validation: ${{ inputs.venture-id }}" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
+          echo "| Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
+          echo "| Skipped | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
