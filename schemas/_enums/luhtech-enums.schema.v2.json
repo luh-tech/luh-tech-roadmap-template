@@ -367,6 +367,42 @@
       "type": "string",
       "description": "Environment variable name pattern (SCREAMING_SNAKE_CASE)",
       "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "fontFamily": {
+      "type": "string",
+      "description": "Supported font families for brand typography",
+      "enum": ["Inter", "Roboto", "Open Sans", "Montserrat", "Poppins", "Lato", "Space Grotesk", "Arial", "Helvetica", "Roboto Mono"]
+    },
+    "backgroundType": {
+      "type": "string",
+      "description": "Type of slide background",
+      "enum": ["solid_color", "image", "gradient"]
+    },
+    "backgroundStyle": {
+      "type": "string",
+      "description": "Standard background styles for different slide contexts",
+      "enum": ["cover", "content", "closing"]
+    },
+    "slideType": {
+      "type": "string",
+      "description": "Slide type for presentation generation",
+      "enum": [
+        "cover", "title",
+        "problem", "solution", "market", "business_model", "traction",
+        "team", "technology", "timeline", "validation", "partnership",
+        "competition", "financials", "go_to_market",
+        "ask", "closing", "contact", "thank_you"
+      ]
+    },
+    "driveFileIdPattern": {
+      "type": "string",
+      "description": "Google Drive file ID pattern (25+ chars alphanumeric with underscores/hyphens)",
+      "pattern": "^[a-zA-Z0-9_-]{25,}$"
+    },
+    "imageMimeType": {
+      "type": "string",
+      "description": "Supported image MIME types for brand assets",
+      "enum": ["image/png", "image/jpeg", "image/svg+xml", "image/gif", "image/webp"]
     }
   }
 }
