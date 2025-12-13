@@ -202,6 +202,10 @@
         "ask": {
           "type": "string",
           "description": "Funding ask"
+        },
+        "technology": {
+          "type": "string",
+          "description": "Technical architecture and technology stack summary"
         }
       }
     },
