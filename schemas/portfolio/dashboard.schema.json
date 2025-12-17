@@ -1,0 +1,300 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/portfolio/dashboard.schema.json",
+  "title": "LuhTech Dashboard Configuration Schema",
+  "description": "Schema-first configuration for portfolio dashboards including Mermaid diagrams, metrics, and sync settings. All dashboard implementations must validate against this schema.",
+  "type": "object",
+  "required": ["$schema", "schemaVersion", "meta", "dashboards"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "const": "https://luhtech.dev/schemas/portfolio/dashboard.schema.json",
+      "description": "Schema reference (required for schema-first compliance)"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version for compatibility tracking",
+      "examples": ["1.0.0"]
+    },
+    "meta": {
+      "type": "object",
+      "required": ["lastUpdated", "schemaFirst", "sourceOfTruth"],
+      "properties": {
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of last update"
+        },
+        "schemaFirst": {
+          "type": "boolean",
+          "const": true,
+          "description": "SELF-DOCUMENTING: This file follows schema-first architecture"
+        },
+        "sourceOfTruth": {
+          "type": "string",
+          "const": "luh-tech/business-tools",
+          "description": "Canonical location of dashboard configuration"
+        },
+        "derivedFrom": {
+          "type": "string",
+          "description": "Schema that governs this file"
+        }
+      }
+    },
+    "dashboards": {
+      "type": "object",
+      "description": "Dashboard definitions by type",
+      "additionalProperties": {
+        "$ref": "#/definitions/dashboard"
+      }
+    },
+    "mermaidDiagrams": {
+      "type": "object",
+      "description": "Mermaid diagram definitions for visualization",
+      "additionalProperties": {
+        "$ref": "#/definitions/mermaidDiagram"
+      }
+    },
+    "syncConfig": {
+      "$ref": "#/definitions/syncConfig"
+    },
+    "notionConfig": {
+      "$ref": "#/definitions/notionConfig"
+    }
+  },
+  "definitions": {
+    "dashboard": {
+      "type": "object",
+      "required": ["id", "title", "type", "components"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Unique dashboard identifier"
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable dashboard title"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["portfolio", "venture", "infrastructure", "pipeline", "analytics"],
+          "description": "Dashboard type classification"
+        },
+        "description": {
+          "type": "string",
+          "description": "Dashboard purpose and scope"
+        },
+        "notionPageId": {
+          "type": "string",
+          "pattern": "^[a-f0-9-]{32,36}$",
+          "description": "Notion page ID (UUID format)"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/dashboardComponent"
+          },
+          "minItems": 1,
+          "description": "Dashboard components in display order"
+        },
+        "refreshInterval": {
+          "type": "integer",
+          "minimum": 60,
+          "default": 3600,
+          "description": "Refresh interval in seconds (minimum 60)"
+        },
+        "dataSource": {
+          "type": "string",
+          "enum": ["github", "notion", "prometheus", "aggregator", "manual"],
+          "description": "Primary data source for this dashboard"
+        }
+      }
+    },
+    "dashboardComponent": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Component identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "status-matrix",
+            "metric-card",
+            "mermaid-diagram",
+            "data-table",
+            "timeline",
+            "chart",
+            "link-list",
+            "text-block",
+            "resource-allocation",
+            "quality-score"
+          ],
+          "description": "Component type"
+        },
+        "title": {
+          "type": "string",
+          "description": "Component header title"
+        },
+        "mermaidRef": {
+          "type": "string",
+          "description": "Reference to mermaidDiagrams key (for mermaid-diagram type)"
+        },
+        "dataQuery": {
+          "type": "string",
+          "description": "Data query or field path"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": { "type": "string" },
+              "label": { "type": "string" },
+              "format": { "type": "string" }
+            }
+          },
+          "description": "Column definitions for table components"
+        },
+        "style": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "string" },
+            "height": { "type": "string" },
+            "color": { "type": "string" }
+          }
+        }
+      }
+    },
+    "mermaidDiagram": {
+      "type": "object",
+      "required": ["id", "type", "title"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Diagram identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["flowchart", "gantt", "sequenceDiagram", "stateDiagram", "stateDiagram-v2", "graph"],
+          "description": "Mermaid diagram type"
+        },
+        "title": {
+          "type": "string",
+          "description": "Diagram title"
+        },
+        "description": {
+          "type": "string",
+          "description": "Diagram purpose"
+        },
+        "template": {
+          "type": "string",
+          "description": "Mermaid syntax template with placeholders"
+        },
+        "dataBindings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of placeholder names to data field paths"
+        },
+        "renderConfig": {
+          "type": "object",
+          "properties": {
+            "theme": {
+              "type": "string",
+              "enum": ["default", "dark", "forest", "neutral"],
+              "default": "default"
+            },
+            "direction": {
+              "type": "string",
+              "enum": ["TB", "BT", "LR", "RL"],
+              "default": "LR"
+            }
+          }
+        },
+        "lastRendered": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "outputUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of last rendered diagram image"
+        }
+      }
+    },
+    "syncConfig": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "schedule": {
+          "type": "string",
+          "description": "Cron expression for sync schedule",
+          "examples": ["0 6 * * *", "*/30 * * * *"]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { 
+                "type": "string",
+                "enum": ["github", "notion", "prometheus", "google-slides"]
+              },
+              "endpoint": { "type": "string" },
+              "authType": { 
+                "type": "string",
+                "enum": ["token", "oauth", "api-key"]
+              }
+            }
+          }
+        },
+        "webhooks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "event": { "type": "string" },
+              "url": { "type": "string", "format": "uri" }
+            }
+          }
+        }
+      }
+    },
+    "notionConfig": {
+      "type": "object",
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "description": "Notion workspace identifier"
+        },
+        "databases": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9-]{32,36}$"
+          },
+          "description": "Map of database names to Notion database IDs"
+        },
+        "pages": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9-]{32,36}$"
+          },
+          "description": "Map of page names to Notion page IDs"
+        }
+      }
+    }
+  }
+}
