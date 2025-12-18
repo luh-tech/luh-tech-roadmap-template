@@ -1,0 +1,263 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/portfolio/user-metrics.schema.json",
+  "title": "LuhTech User Metrics Schema",
+  "description": "Schema-first definition for user funnel, engagement, and email metrics. Used by dashboard-generator to sync User Funnel dashboard from Twenty CRM and Resend APIs.",
+  "type": "object",
+  "required": ["$schema", "schemaVersion", "meta", "timestamp"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "const": "https://luhtech.dev/schemas/portfolio/user-metrics.schema.json",
+      "description": "Schema reference (required for schema-first compliance)"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version for compatibility tracking",
+      "examples": ["1.0.0"]
+    },
+    "meta": {
+      "type": "object",
+      "required": ["lastUpdated", "schemaFirst", "sourceOfTruth"],
+      "properties": {
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of last update"
+        },
+        "schemaFirst": {
+          "type": "boolean",
+          "const": true,
+          "description": "SELF-DOCUMENTING: This file follows schema-first architecture"
+        },
+        "sourceOfTruth": {
+          "type": "string",
+          "description": "Canonical location of this data"
+        },
+        "derivedFrom": {
+          "type": "string",
+          "description": "Schema that governs this file"
+        }
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When these metrics were captured"
+    },
+    "period": {
+      "type": "string",
+      "enum": ["daily", "weekly", "monthly", "all-time"],
+      "default": "monthly",
+      "description": "Time period for aggregated metrics"
+    },
+    "ventureId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Optional venture filter (null = portfolio-wide)"
+    },
+    "funnel": {
+      "type": "object",
+      "description": "User acquisition funnel metrics",
+      "properties": {
+        "visitors": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Unique website visitors"
+        },
+        "signups": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "New user registrations"
+        },
+        "activations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Users who completed onboarding/first action"
+        },
+        "conversions": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Users who converted to paid/target action"
+        },
+        "churned": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Users who became inactive/cancelled"
+        }
+      },
+      "additionalProperties": false
+    },
+    "engagement": {
+      "type": "object",
+      "description": "User engagement metrics",
+      "properties": {
+        "dau": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Daily Active Users"
+        },
+        "wau": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Weekly Active Users"
+        },
+        "mau": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Monthly Active Users"
+        }
+      },
+      "additionalProperties": false
+    },
+    "email": {
+      "type": "object",
+      "description": "Email metrics from Resend API",
+      "properties": {
+        "sent": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total emails sent"
+        },
+        "delivered": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Successfully delivered emails"
+        },
+        "opened": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Emails opened by recipient"
+        },
+        "clicked": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Emails with link clicks"
+        },
+        "bounced": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Bounced/failed emails"
+        },
+        "deliveryRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage: delivered/sent * 100"
+        },
+        "openRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage: opened/delivered * 100"
+        },
+        "clickRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage: clicked/opened * 100"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sources": {
+      "type": "object",
+      "description": "Traffic source attribution",
+      "properties": {
+        "organic": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Organic search traffic"
+        },
+        "referral": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Referral traffic from other sites"
+        },
+        "paid": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Paid advertising traffic"
+        },
+        "direct": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Direct traffic (typed URL, bookmarks)"
+        },
+        "social": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Social media traffic"
+        },
+        "email": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Email campaign traffic"
+        }
+      },
+      "additionalProperties": false
+    },
+    "crm": {
+      "type": "object",
+      "description": "Twenty CRM entity counts",
+      "properties": {
+        "totalPeople": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total people/contacts in CRM"
+        },
+        "totalCompanies": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total companies in CRM"
+        },
+        "totalOpportunities": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total opportunities/deals in CRM"
+        },
+        "newPeopleThisPeriod": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "New people added in current period"
+        },
+        "newCompaniesThisPeriod": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "New companies added in current period"
+        }
+      },
+      "additionalProperties": false
+    },
+    "byVenture": {
+      "type": "array",
+      "description": "Per-venture breakdown (for portfolio view)",
+      "items": {
+        "type": "object",
+        "required": ["ventureId"],
+        "properties": {
+          "ventureId": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "ventureName": {
+            "type": "string"
+          },
+          "peopleCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "companiesCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "opportunitiesCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}
