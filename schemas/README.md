@@ -1,7 +1,7 @@
 # LuhTech Infrastructure Documentation Schema System
 
-**Version:** 1.2.0  
-**Status:** Phase 1 Complete + Portfolio Workflows + Extensions  
+**Version:** 1.3.0  
+**Status:** Phase 1 Complete + Portfolio Workflows + Extensions + URN/Graph System  
 **Date:** 2026-01-06  
 **Principle:** No Shortcuts, Enterprise Excellence Always
 
@@ -16,7 +16,8 @@ This schema system provides standardized infrastructure documentation for the Lu
 - **Accelerator Foundation** - Turnkey templates for new portfolio companies
 - **Schema-First Architecture** - Generated models, CI enforcement, no drift
 - **Cross-Repo Workflow Discovery** - Portfolio workflows referenced by $ref
-- **Venture Extensions** - Explicit sharing control for venture-specific data (NEW)
+- **Venture Extensions** - Explicit sharing control for venture-specific data
+- **URN Identifiers & Graph System** - Cross-venture entity linking and graph queries (NEW)
 
 ---
 
@@ -32,7 +33,7 @@ This schema system provides standardized infrastructure documentation for the Lu
 | `infrastructure-catalog.schema.json` | v1.1.0 | ~24KB | Service registry, environments, secrets, workflows |
 | `tech-stack.schema.json` | v1.0.0 | ~17KB | Languages, frameworks, databases, architecture patterns |
 | `evidence-session.schema.json` | v1.0.0 | ~12KB | Investigation tracking, evidence nodes, retention policies |
-| `extensions.schema.v1.json` | v1.0.0 | ~2KB | **NEW**: Venture-specific extensions with share control |
+| `extensions.schema.v1.json` | v1.0.0 | ~2KB | Venture-specific extensions with share control |
 
 ### Portfolio-Level Schemas
 
@@ -42,14 +43,151 @@ This schema system provides standardized infrastructure documentation for the Lu
 | `portfolio/brand.schema.json` | v1.0.0 | ~11KB | Brand assets, colors, typography |
 | `portfolio/portfolio.schema.json` | v1.0.0 | ~16KB | Aggregated portfolio view |
 | `portfolio/ip-assets.schema.json` | v1.0.0 | ~10KB | Intellectual property tracking |
-| `portfolio/extensions-matrix.schema.v1.json` | v1.0.0 | ~2KB | **NEW**: Portfolio-level extension aggregation |
+| `portfolio/extensions-matrix.schema.v1.json` | v1.0.0 | ~2KB | Portfolio-level extension aggregation |
+| `portfolio/portfolio-graph.schema.v1.json` | v1.0.0 | ~5KB | **NEW**: Portfolio-wide graph structure |
 
 ### Shared Building Blocks
 
 | Schema | Version | Purpose |
 |--------|---------|---------|
 | `_enums/luhtech-enums.schema.v2.json` | v2.0.0 | Shared enumerations (ventureId, status, etc.) |
-| `_definitions/definitions.schema.json` | v1.0.0 | Shared type definitions (contact, money, person, etc.) |
+| `_definitions/definitions.schema.json` | v1.1.0 | Shared type definitions + URN/graph refs |
+| `_definitions/graph.schema.json` | v1.0.0 | **NEW**: URN identifiers and graph metadata |
+
+---
+
+## URN Identifier System (NEW in v1.3.0)
+
+### Purpose
+
+Enable cross-venture entity linking, bidirectional graph traversal, and portfolio-wide graph queries. Based on Ectropy V3 production patterns.
+
+### URN Format
+
+```
+urn:luhtech:{venture}:{nodeType}:{identifier}
+```
+
+### Examples
+
+```
+urn:luhtech:ectropy:file:roadmap
+urn:luhtech:ectropy:decision:d-2026-01-01-database-ha-upgrade
+urn:luhtech:ectropy:service:mcp-server
+urn:luhtech:jobsitecontrol:milestone:ms-hardware-v1
+urn:luhtech:holdings:venture:ectropy
+```
+
+### Node Types
+
+| Type | Description |
+|------|-------------|
+| `venture` | Portfolio venture |
+| `file` | Roadmap file |
+| `milestone` | Project milestone |
+| `decision` | ADR/decision record |
+| `service` | Infrastructure service |
+| `evidence` | Evidence session |
+| `person` | Team member or stakeholder |
+| `ip-asset` | Intellectual property |
+| `dependency` | Dependency record |
+| `phase` | Roadmap phase |
+| `task` | Deliverable/task |
+| `metric` | Business metric |
+| `extension` | Venture extension |
+
+### Edge Types
+
+| Type | Description |
+|------|-------------|
+| `fork` | Fork relationship (with weight) |
+| `depends-on` | Dependency relationship |
+| `blocks` | Blocking relationship |
+| `provides` | Provider relationship |
+| `consumes` | Consumer relationship |
+| `synergy` | Strategic synergy |
+| `supersedes` | Decision supersession |
+| `references` | General reference |
+| `contains` | Parent-child containment |
+| `owns` | Ownership relationship |
+| `implements` | Implementation relationship |
+| `relates-to` | General relationship |
+
+### Graph Metadata Block
+
+Every entity can include bidirectional graph traversal metadata:
+
+```json
+{
+  "$id": "urn:luhtech:ectropy:decision:d-2026-01-01-example",
+  "graphMetadata": {
+    "inEdges": [
+      "urn:luhtech:ectropy:decision:d-2025-12-parent-decision"
+    ],
+    "outEdges": [
+      "urn:luhtech:ectropy:service:service-affected"
+    ]
+  }
+}
+```
+
+### Using URNs in Schemas
+
+Reference URN and graph definitions in your schemas:
+
+```json
+{
+  "properties": {
+    "$id": {
+      "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/urn",
+      "description": "URN identifier for this entity"
+    },
+    "graphMetadata": {
+      "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/graphMetadata",
+      "description": "Graph traversal metadata"
+    }
+  }
+}
+```
+
+### Portfolio Graph
+
+The `portfolio-graph.schema.v1.json` enables Holdings-level graph aggregation:
+
+```json
+{
+  "$schema": "https://luhtech.dev/schemas/portfolio-graph.v1.json",
+  "meta": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-01-06T20:00:00Z",
+    "totalNodes": 127,
+    "totalEdges": 89,
+    "ventures": ["ectropy", "jobsitecontrol", "qullqa"]
+  },
+  "nodes": [...],
+  "edges": [...],
+  "indexes": {
+    "byType": {
+      "venture": ["urn:luhtech:holdings:venture:ectropy", ...],
+      "service": ["urn:luhtech:ectropy:service:mcp-server", ...]
+    },
+    "byVenture": {
+      "ectropy": ["urn:luhtech:ectropy:file:roadmap", ...],
+      "jobsitecontrol": [...]
+    }
+  },
+  "crossVentureRelationships": [
+    {
+      "from": "urn:luhtech:jobsitecontrol:venture:jobsitecontrol",
+      "to": "urn:luhtech:ectropy:venture:ectropy",
+      "type": "fork",
+      "sourceVenture": "jobsitecontrol",
+      "targetVenture": "ectropy",
+      "weight": 0.85
+    }
+  ]
+}
+```
 
 ---
 
@@ -70,21 +208,23 @@ luh-tech/luh-tech-roadmap-template/schemas/
 │   ├── infrastructure-catalog.schema.json
 │   ├── tech-stack.schema.json
 │   ├── evidence-session.schema.json
-│   └── extensions.schema.v1.json          ← NEW
+│   └── extensions.schema.v1.json
 │
 ├── PORTFOLIO-LEVEL (Cross-venture operations)
 │   ├── portfolio/workflow-registry.schema.json
 │   ├── portfolio/brand.schema.json
 │   ├── portfolio/portfolio.schema.json
 │   ├── portfolio/ip-assets.schema.json
-│   └── portfolio/extensions-matrix.schema.v1.json  ← NEW
+│   ├── portfolio/extensions-matrix.schema.v1.json
+│   └── portfolio/portfolio-graph.schema.v1.json    ← NEW
 │
 ├── _enums/
 │   ├── luhtech-enums.schema.json
 │   └── luhtech-enums.schema.v2.json
 │
 └── _definitions/
-    └── definitions.schema.json
+    ├── definitions.schema.json                      ← Updated with URN refs
+    └── graph.schema.json                            ← NEW
 ```
 
 ---
@@ -100,7 +240,7 @@ luh-tech/luh-tech-roadmap-template/schemas/
 ├── decision-log.json               ← Architectural decisions (v2)
 ├── infrastructure-catalog.json     ← Service registry
 ├── tech-stack.json                 ← Technology documentation
-├── extensions.json                 ← Venture-specific extensions (NEW)
+├── extensions.json                 ← Venture-specific extensions
 └── evidence/                       ← Evidence sessions directory
     └── ...
 ```
@@ -111,12 +251,13 @@ luh-tech/luh-tech-roadmap-template/schemas/
 LuhTech-business/.roadmap/
 ├── portfolio.json                  ← Aggregated portfolio view
 ├── ip-assets.json                  ← IP tracking
-└── extensions-matrix.json          ← Shared extensions from all ventures (NEW)
+├── extensions-matrix.json          ← Shared extensions from all ventures
+└── portfolio-graph.json            ← Portfolio-wide graph (NEW)
 ```
 
 ---
 
-## Extensions System (NEW in v1.2.0)
+## Extensions System
 
 ### Purpose
 
@@ -160,53 +301,6 @@ Ventures can define custom data extensions while controlling what is shared with
 | `version` | Optional | Extension version (semver) |
 | `data` | ✅ | Extension payload (any valid JSON) |
 
-### Holdings extensions-matrix.json
-
-Aggregates only `share: true` extensions from all ventures:
-
-```json
-{
-  "$schema": "https://luhtech.dev/schemas/portfolio/extensions-matrix-v1.json",
-  "lastUpdated": "2026-01-06T20:00:00Z",
-  "ventures": {
-    "ectropy": ["mcp", "spatial", "decisionGraph"],
-    "jobsitecontrol": ["hardware", "sensors"],
-    "qullqa": ["aduDesign", "permits"],
-    "hilja": [],
-    "viiva": [],
-    "raizal": [],
-    "replique": [],
-    "luhtech": []
-  },
-  "sharedExtensions": {
-    "ectropy:mcp": { "ventureId": "ectropy", "data": {...} },
-    "jobsitecontrol:hardware": { "ventureId": "jobsitecontrol", "data": {...} }
-  },
-  "stats": {
-    "totalVentures": 8,
-    "venturesWithExtensions": 3,
-    "totalSharedExtensions": 7
-  }
-}
-```
-
-### Data Flow
-
-```
-VENTURES                              HOLDINGS
-┌──────────────────┐                 ┌──────────────────────────┐
-│ extensions.json  │                 │                          │
-│ {                │                 │  extensions-matrix.json  │
-│   "mcp": {       │──share:true───▶│  - tracks shared         │
-│     share: true  │                 │  - aggregates data       │
-│   },             │                 │                          │
-│   "internal": {  │                 │                          │
-│     share: false │──(blocked)──X   │                          │
-│   }              │                 │                          │
-│ }                │                 └──────────────────────────┘
-└──────────────────┘
-```
-
 ---
 
 ## Validation
@@ -216,13 +310,23 @@ VENTURES                              HOLDINGS
 Add to `.github/workflows/roadmap-ci.yml`:
 
 ```yaml
-- name: Validate Extensions
+- name: Validate Roadmap Files
   run: |
+    # Validate core files
+    npx ajv validate -s schemas/roadmap.schema.v2.json -d .roadmap/roadmap.json
+    
+    # Validate extensions if present
     if [ -f ".roadmap/extensions.json" ]; then
       npx ajv validate \
         -s schemas/extensions.schema.v1.json \
         -d .roadmap/extensions.json
     fi
+
+- name: Validate URN Format
+  run: |
+    # Check all $id fields match URN pattern
+    grep -r '"$id"' .roadmap/*.json | \
+      grep -v 'urn:luhtech:' && echo "ERROR: Non-URN $id found" && exit 1 || true
 ```
 
 ### Local Validation
@@ -233,26 +337,38 @@ npm install -g ajv-cli ajv-formats
 
 # Validate extensions
 ajv validate -s schemas/extensions.schema.v1.json -d .roadmap/extensions.json
+
+# Validate graph
+ajv validate -s schemas/portfolio/portfolio-graph.schema.v1.json -d .roadmap/portfolio-graph.json
 ```
 
 ---
 
 ## Changelog
 
+### v1.3.0 (2026-01-06)
+- **NEW**: `_definitions/graph.schema.json` v1.0.0
+  - URN identifier pattern: `urn:luhtech:{venture}:{nodeType}:{identifier}`
+  - Graph metadata with bidirectional edges (inEdges/outEdges)
+  - Node type enumeration (13 types)
+  - Edge type enumeration (12 types)
+  - Based on Ectropy V3 production patterns
+- **NEW**: `portfolio/portfolio-graph.schema.v1.json` v1.0.0
+  - Portfolio-wide graph aggregation
+  - Pre-computed indexes (byType, byVenture, byEdgeType, adjacency)
+  - Cross-venture relationship tracking
+- **UPDATED**: `_definitions/definitions.schema.json` v1.1.0
+  - Added URN and graphMetadata references
+  - Added $id (URN) to person and organization definitions
+  - Added syncStatus for V3 compatibility
+
 ### v1.2.0 (2026-01-06)
 - **NEW**: `extensions.schema.v1.json` v1.0.0
-  - Venture-specific extensions with explicit share control
-  - Supports any JSON payload in `data` field
-  - Version tracking per extension
 - **NEW**: `portfolio/extensions-matrix.schema.v1.json` v1.0.0
-  - Aggregates shared extensions from all ventures
-  - Tracks which ventures share which extensions
-  - Summary statistics
 
 ### v1.1.0 (2025-12-12)
 - **NEW**: `portfolio/workflow-registry.schema.json` v1.0.0
 - **UPDATED**: `infrastructure-catalog.schema.json` v1.1.0
-  - Added `portfolioWorkflowsRef` for cross-repo workflow discovery
 
 ### v1.0.0 (2025-12-11)
 - Initial release with core schemas
@@ -263,13 +379,16 @@ ajv validate -s schemas/extensions.schema.v1.json -d .roadmap/extensions.json
 
 ✅ Schema-first architecture (not code-first)  
 ✅ Single source of truth (luh-tech-roadmap-template)  
-✅ Derived from proven system (Ectropy production)  
+✅ Derived from proven system (Ectropy V3 production)  
 ✅ Comprehensive documentation  
 ✅ CI validation ready  
 ✅ Migration path documented  
 ✅ Backward compatible  
 ✅ Cross-repo reference pattern ($ref)  
 ✅ Self-documenting (meta.schemaFirst)  
-✅ Extension system with explicit sharing (NEW)  
+✅ Extension system with explicit sharing  
+✅ URN identifiers for entity linking (NEW)  
+✅ Bidirectional graph traversal (NEW)  
+✅ Portfolio-wide graph queries (NEW)  
 
 **No shortcuts. Enterprise excellence always.**
