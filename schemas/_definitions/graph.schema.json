@@ -1,0 +1,284 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/graph.json",
+  "title": "LuhTech Graph Definitions",
+  "description": "URN identifiers and graph metadata definitions for portfolio-wide entity linking. Enables cross-venture graph queries and bidirectional relationship traversal.",
+  "definitions": {
+    "_metadata": {
+      "type": "object",
+      "description": "Schema metadata - not for validation",
+      "properties": {
+        "version": {"const": "1.0.0"},
+        "lastUpdated": {"const": "2026-01-06"},
+        "maintainer": {"const": "LuhTech Enterprise Infrastructure"},
+        "basedOn": {"const": "V3 Ectropy URN Pattern"}
+      }
+    },
+
+    "urn": {
+      "type": "string",
+      "description": "LuhTech URN identifier. Format: urn:luhtech:{venture}:{nodeType}:{identifier}",
+      "pattern": "^urn:luhtech:[a-z][a-z0-9-]*:[a-z][a-z0-9-]*:[a-z0-9][a-z0-9-]*$",
+      "examples": [
+        "urn:luhtech:ectropy:file:roadmap",
+        "urn:luhtech:ectropy:decision:d-2026-01-01-database-ha-upgrade",
+        "urn:luhtech:ectropy:service:mcp-server",
+        "urn:luhtech:jobsitecontrol:milestone:ms-hardware-v1",
+        "urn:luhtech:holdings:venture:ectropy"
+      ]
+    },
+
+    "urnReference": {
+      "type": "object",
+      "description": "URN reference with optional metadata",
+      "required": ["$ref"],
+      "properties": {
+        "$ref": {
+          "$ref": "#/definitions/urn",
+          "description": "URN of the referenced entity"
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable label for this reference"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Relationship strength (0-1), used for fork inheritance etc."
+        }
+      }
+    },
+
+    "nodeType": {
+      "type": "string",
+      "description": "Graph node type classification",
+      "enum": [
+        "venture",
+        "file",
+        "milestone",
+        "decision",
+        "service",
+        "evidence",
+        "person",
+        "ip-asset",
+        "dependency",
+        "phase",
+        "task",
+        "metric",
+        "extension"
+      ]
+    },
+
+    "edgeType": {
+      "type": "string",
+      "description": "Graph edge relationship type",
+      "enum": [
+        "fork",
+        "depends-on",
+        "blocks",
+        "provides",
+        "consumes",
+        "synergy",
+        "supersedes",
+        "references",
+        "contains",
+        "owns",
+        "implements",
+        "relates-to"
+      ]
+    },
+
+    "edge": {
+      "type": "object",
+      "description": "Directed edge between two nodes",
+      "required": ["from", "to", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/definitions/urn",
+          "description": "Source node URN"
+        },
+        "to": {
+          "$ref": "#/definitions/urn",
+          "description": "Target node URN"
+        },
+        "type": {
+          "$ref": "#/definitions/edgeType",
+          "description": "Relationship type"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1,
+          "description": "Edge weight (0-1)"
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable edge label"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional edge metadata",
+          "additionalProperties": true
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Edge creation timestamp"
+        }
+      }
+    },
+
+    "graphMetadata": {
+      "type": "object",
+      "description": "Bidirectional graph traversal metadata for a node",
+      "additionalProperties": false,
+      "properties": {
+        "inEdges": {
+          "type": "array",
+          "description": "URNs of nodes pointing TO this node",
+          "items": {
+            "$ref": "#/definitions/urn"
+          },
+          "uniqueItems": true
+        },
+        "outEdges": {
+          "type": "array",
+          "description": "URNs of nodes this node points TO",
+          "items": {
+            "$ref": "#/definitions/urn"
+          },
+          "uniqueItems": true
+        },
+        "edges": {
+          "type": "array",
+          "description": "Detailed edge definitions (optional, for richer metadata)",
+          "items": {
+            "$ref": "#/definitions/edge"
+          }
+        }
+      }
+    },
+
+    "graphNode": {
+      "type": "object",
+      "description": "A node in the portfolio graph",
+      "required": ["$id", "type"],
+      "properties": {
+        "$id": {
+          "$ref": "#/definitions/urn",
+          "description": "Unique URN identifier for this node"
+        },
+        "type": {
+          "$ref": "#/definitions/nodeType",
+          "description": "Node type classification"
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable node label"
+        },
+        "description": {
+          "type": "string",
+          "description": "Node description"
+        },
+        "ventureId": {
+          "$ref": "https://luhtech.dev/schemas/enums-v2.json#/definitions/ventureId",
+          "description": "Owning venture"
+        },
+        "path": {
+          "type": "string",
+          "description": "File path if this is a file node"
+        },
+        "graphMetadata": {
+          "$ref": "#/definitions/graphMetadata",
+          "description": "Graph traversal metadata"
+        },
+        "data": {
+          "type": "object",
+          "description": "Node-specific payload data",
+          "additionalProperties": true
+        }
+      }
+    },
+
+    "portfolioGraph": {
+      "type": "object",
+      "description": "Complete portfolio graph structure",
+      "required": ["nodes"],
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "type": "object",
+          "properties": {
+            "totalNodes": {"type": "integer", "minimum": 0},
+            "totalEdges": {"type": "integer", "minimum": 0},
+            "lastUpdated": {"type": "string", "format": "date-time"},
+            "nodeTypes": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/nodeType"}
+            }
+          }
+        },
+        "nodes": {
+          "type": "array",
+          "description": "All nodes in the graph",
+          "items": {
+            "$ref": "#/definitions/graphNode"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "description": "Explicit edge list (alternative to inEdges/outEdges)",
+          "items": {
+            "$ref": "#/definitions/edge"
+          }
+        },
+        "indexes": {
+          "type": "object",
+          "description": "Pre-computed indexes for fast lookup",
+          "properties": {
+            "byType": {
+              "type": "object",
+              "description": "Node URNs grouped by type",
+              "additionalProperties": {
+                "type": "array",
+                "items": {"$ref": "#/definitions/urn"}
+              }
+            },
+            "byVenture": {
+              "type": "object", 
+              "description": "Node URNs grouped by venture",
+              "additionalProperties": {
+                "type": "array",
+                "items": {"$ref": "#/definitions/urn"}
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "syncStatus": {
+      "type": "object",
+      "description": "Sync metadata for V3 compatibility",
+      "properties": {
+        "v1Path": {
+          "type": "string",
+          "description": "Legacy V1 file path if applicable"
+        },
+        "lastSync": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last synchronization timestamp"
+        },
+        "syncDirection": {
+          "type": "string",
+          "enum": ["v3-is-source-of-truth", "bidirectional", "v1-is-source"],
+          "default": "v3-is-source-of-truth"
+        }
+      }
+    }
+  }
+}
