@@ -1,8 +1,8 @@
 # LuhTech Infrastructure Documentation Schema System
 
-**Version:** 1.1.0  
-**Status:** Phase 1 Complete + Portfolio Workflows  
-**Date:** 2025-12-12  
+**Version:** 1.2.0  
+**Status:** Phase 1 Complete + Portfolio Workflows + Extensions  
+**Date:** 2026-01-06  
 **Principle:** No Shortcuts, Enterprise Excellence Always
 
 ---
@@ -15,7 +15,8 @@ This schema system provides standardized infrastructure documentation for the Lu
 - **Portfolio Intelligence** - Aggregator-level visibility across 8 ventures
 - **Accelerator Foundation** - Turnkey templates for new portfolio companies
 - **Schema-First Architecture** - Generated models, CI enforcement, no drift
-- **Cross-Repo Workflow Discovery** - Portfolio workflows referenced by $ref (NEW)
+- **Cross-Repo Workflow Discovery** - Portfolio workflows referenced by $ref
+- **Venture Extensions** - Explicit sharing control for venture-specific data (NEW)
 
 ---
 
@@ -23,20 +24,32 @@ This schema system provides standardized infrastructure documentation for the Lu
 
 | Schema | Version | Size | Purpose |
 |--------|---------|------|---------|
-| `infrastructure-catalog.schema.json` | v1.1.0 | ~24KB | Service registry, environments, secrets, workflows, **portfolioWorkflowsRef** |
-| `tech-stack.schema.json` | v1.0.0 | ~15KB | Languages, frameworks, databases, architecture patterns |
-| `evidence-session.schema.json` | v1.0.0 | ~14KB | Investigation tracking, evidence nodes, retention policies |
-| `decision-log.schema.v2.json` | v2.0.0 | ~12KB | Enhanced ADR with voting, indexes, implementation tracking |
-| `luhtech-enums.schema.v2.json` | v2.0.0 | ~16KB | Extended shared enumerations for all schemas |
+| `roadmap.schema.v2.json` | v2.0.0 | ~19KB | Venture roadmap, quarters, financials, milestones |
+| `venture-summary.schema.json` | v1.0.0 | ~11KB | Investor pitch summary |
+| `decision-log.schema.v2.json` | v2.0.0 | ~10KB | Enhanced ADR with voting, indexes, implementation tracking |
+| `dependencies.schema.json` | v1.0.0 | ~5KB | Cross-venture dependencies |
+| `boundaries.schema.json` | v1.0.0 | ~3KB | Fork configuration |
+| `infrastructure-catalog.schema.json` | v1.1.0 | ~24KB | Service registry, environments, secrets, workflows |
+| `tech-stack.schema.json` | v1.0.0 | ~17KB | Languages, frameworks, databases, architecture patterns |
+| `evidence-session.schema.json` | v1.0.0 | ~12KB | Investigation tracking, evidence nodes, retention policies |
+| `extensions.schema.v1.json` | v1.0.0 | ~2KB | **NEW**: Venture-specific extensions with share control |
 
 ### Portfolio-Level Schemas
 
 | Schema | Version | Size | Purpose |
 |--------|---------|------|---------|
-| `portfolio/workflow-registry.schema.json` | v1.0.0 | ~11KB | **NEW**: Portfolio workflow definitions, transformers, deck types |
+| `portfolio/workflow-registry.schema.json` | v1.0.0 | ~11KB | Portfolio workflow definitions, transformers, deck types |
 | `portfolio/brand.schema.json` | v1.0.0 | ~11KB | Brand assets, colors, typography |
 | `portfolio/portfolio.schema.json` | v1.0.0 | ~16KB | Aggregated portfolio view |
 | `portfolio/ip-assets.schema.json` | v1.0.0 | ~10KB | Intellectual property tracking |
+| `portfolio/extensions-matrix.schema.v1.json` | v1.0.0 | ~2KB | **NEW**: Portfolio-level extension aggregation |
+
+### Shared Building Blocks
+
+| Schema | Version | Purpose |
+|--------|---------|---------|
+| `_enums/luhtech-enums.schema.v2.json` | v2.0.0 | Shared enumerations (ventureId, status, etc.) |
+| `_definitions/definitions.schema.json` | v1.0.0 | Shared type definitions (contact, money, person, etc.) |
 
 ---
 
@@ -53,16 +66,18 @@ luh-tech/luh-tech-roadmap-template/schemas/
 │   ├── venture-summary.schema.json
 │   ├── dependencies.schema.json
 │   ├── boundaries.schema.json
-│   ├── infrastructure-catalog.schema.json  ← Updated: portfolioWorkflowsRef
+│   ├── decision-log.schema.v2.json
+│   ├── infrastructure-catalog.schema.json
 │   ├── tech-stack.schema.json
 │   ├── evidence-session.schema.json
-│   └── decision-log.schema.v2.json
+│   └── extensions.schema.v1.json          ← NEW
 │
 ├── PORTFOLIO-LEVEL (Cross-venture operations)
-│   ├── portfolio/workflow-registry.schema.json  ← NEW
+│   ├── portfolio/workflow-registry.schema.json
 │   ├── portfolio/brand.schema.json
 │   ├── portfolio/portfolio.schema.json
-│   └── portfolio/ip-assets.schema.json
+│   ├── portfolio/ip-assets.schema.json
+│   └── portfolio/extensions-matrix.schema.v1.json  ← NEW
 │
 ├── _enums/
 │   ├── luhtech-enums.schema.json
@@ -71,36 +86,6 @@ luh-tech/luh-tech-roadmap-template/schemas/
 └── _definitions/
     └── definitions.schema.json
 ```
-
-### Cross-Repo Reference Pattern
-
-The **workflow-registry.schema.json** enables a powerful cross-repo discovery pattern:
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│               SCHEMA-FIRST WORKFLOW ARCHITECTURE                │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  luh-tech-roadmap-template/schemas/                             │
-│  ├── portfolio/workflow-registry.schema.json  ← Schema (Tier 0)│
-│  └── infrastructure-catalog.schema.json       ← portfolioRef   │
-│                          │                                      │
-│                          ▼                                      │
-│  business-tools/config/                                         │
-│  └── workflow-registry.json  ← Implementation (Source of Truth)│
-│            │                                                    │
-│            │  $ref: raw.githubusercontent.com/.../workflow...   │
-│            ▼                                                    │
-│  {venture}/.roadmap/infrastructure-catalog.json                 │
-│  └── portfolioWorkflowsRef: { "$ref": "..." }  ← Discovery     │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-**Benefits:**
-- Ventures discover portfolio workflows by reference, not duplication
-- Schema validates both the registry AND the reference
-- Self-documenting via `meta.schemaFirst: true` in data files
 
 ---
 
@@ -113,87 +98,114 @@ The **workflow-registry.schema.json** enables a powerful cross-repo discovery pa
 ├── dependencies.json               ← Cross-venture links
 ├── boundaries.json                 ← Fork configuration
 ├── decision-log.json               ← Architectural decisions (v2)
-├── infrastructure-catalog.json     ← Service registry + portfolioWorkflowsRef
+├── infrastructure-catalog.json     ← Service registry
 ├── tech-stack.json                 ← Technology documentation
+├── extensions.json                 ← Venture-specific extensions (NEW)
 └── evidence/                       ← Evidence sessions directory
-    ├── evidence-2025-q4.json
     └── ...
 ```
 
-### Portfolio Operations (business-tools)
+### Portfolio Operations (LuhTech-business)
 
 ```
-business-tools/config/
-├── workflow-registry.json          ← Canonical workflow definitions
-├── ventures.json                   ← Venture registry
-└── brands.json                     ← Brand assets (slide-generator)
-```
-
----
-
-## Workflow Registry Schema
-
-The new `workflow-registry.schema.json` defines:
-
-### Workflows
-Portfolio-level operations (validate, aggregate, generate):
-```json
-{
-  "validate-portfolio": {
-    "id": "validate-portfolio",
-    "tool": "roadmap-aggregator-v3",
-    "command": "python -m roadmap_aggregator validate",
-    "requires": [],
-    "dependencies": { "secrets": ["GITHUB_TOKEN"] }
-  }
-}
-```
-
-### Transformers
-Mappings from roadmap.json fields to slide content:
-```json
-{
-  "cover": {
-    "id": "cover",
-    "requiredFields": ["meta.ventureName", "pitch.oneLiner"],
-    "outputType": "slide"
-  }
-}
-```
-
-### Deck Types
-Slide deck composition rules:
-```json
-{
-  "investor": {
-    "id": "investor",
-    "slides": ["cover", "problem", "solution", "market", "business_model", "traction", "team", "ask", "timeline"],
-    "requiredCompleteness": 0.8,
-    "audience": "investor"
-  }
-}
+LuhTech-business/.roadmap/
+├── portfolio.json                  ← Aggregated portfolio view
+├── ip-assets.json                  ← IP tracking
+└── extensions-matrix.json          ← Shared extensions from all ventures (NEW)
 ```
 
 ---
 
-## Self-Documenting Pattern
+## Extensions System (NEW in v1.2.0)
 
-All workflow registry files MUST include self-documenting metadata:
+### Purpose
+
+Ventures can define custom data extensions while controlling what is shared with Holdings.
+
+### Venture extensions.json
 
 ```json
 {
-  "$schema": "https://luhtech.dev/schemas/portfolio/workflow-registry-v1.json",
-  "schemaVersion": "1.0.0",
-  "meta": {
-    "lastUpdated": "2025-12-12T00:00:00Z",
-    "schemaFirst": true,
-    "sourceOfTruth": "luh-tech/business-tools",
-    "derivedFrom": "https://luhtech.dev/schemas/portfolio/workflow-registry-v1.json"
+  "$schema": "https://luhtech.dev/schemas/extensions-v1.json",
+  "ventureId": "ectropy",
+  "lastUpdated": "2026-01-06T20:00:00Z",
+  "extensions": {
+    "mcp": {
+      "share": true,
+      "description": "MCP server and tool integration metrics",
+      "version": "1.0.0",
+      "data": {
+        "serverCount": 4,
+        "toolCount": 47
+      }
+    },
+    "internal": {
+      "share": false,
+      "description": "Internal dev notes - not shared",
+      "version": "1.0.0",
+      "data": {
+        "blockers": ["Repository split pending"]
+      }
+    }
   }
 }
 ```
 
-The `schemaFirst: true` field is **required** and **must be true** - this self-documents that the file follows schema-first architecture.
+### Key Fields
+
+| Field | Required | Purpose |
+|-------|----------|---------|
+| `share` | ✅ | `true` = visible to Holdings, `false` = private |
+| `description` | Optional | Human-readable description |
+| `version` | Optional | Extension version (semver) |
+| `data` | ✅ | Extension payload (any valid JSON) |
+
+### Holdings extensions-matrix.json
+
+Aggregates only `share: true` extensions from all ventures:
+
+```json
+{
+  "$schema": "https://luhtech.dev/schemas/portfolio/extensions-matrix-v1.json",
+  "lastUpdated": "2026-01-06T20:00:00Z",
+  "ventures": {
+    "ectropy": ["mcp", "spatial", "decisionGraph"],
+    "jobsitecontrol": ["hardware", "sensors"],
+    "qullqa": ["aduDesign", "permits"],
+    "hilja": [],
+    "viiva": [],
+    "raizal": [],
+    "replique": [],
+    "luhtech": []
+  },
+  "sharedExtensions": {
+    "ectropy:mcp": { "ventureId": "ectropy", "data": {...} },
+    "jobsitecontrol:hardware": { "ventureId": "jobsitecontrol", "data": {...} }
+  },
+  "stats": {
+    "totalVentures": 8,
+    "venturesWithExtensions": 3,
+    "totalSharedExtensions": 7
+  }
+}
+```
+
+### Data Flow
+
+```
+VENTURES                              HOLDINGS
+┌──────────────────┐                 ┌──────────────────────────┐
+│ extensions.json  │                 │                          │
+│ {                │                 │  extensions-matrix.json  │
+│   "mcp": {       │──share:true───▶│  - tracks shared         │
+│     share: true  │                 │  - aggregates data       │
+│   },             │                 │                          │
+│   "internal": {  │                 │                          │
+│     share: false │──(blocked)──X   │                          │
+│   }              │                 │                          │
+│ }                │                 └──────────────────────────┘
+└──────────────────┘
+```
 
 ---
 
@@ -204,28 +216,13 @@ The `schemaFirst: true` field is **required** and **must be true** - this self-d
 Add to `.github/workflows/roadmap-ci.yml`:
 
 ```yaml
-- name: Validate Infrastructure Files
+- name: Validate Extensions
   run: |
-    # Validate infrastructure-catalog.json if exists
-    if [ -f ".roadmap/infrastructure-catalog.json" ]; then
+    if [ -f ".roadmap/extensions.json" ]; then
       npx ajv validate \
-        -s schemas/infrastructure-catalog.schema.json \
-        -d .roadmap/infrastructure-catalog.json
+        -s schemas/extensions.schema.v1.json \
+        -d .roadmap/extensions.json
     fi
-    
-    # Validate tech-stack.json if exists
-    if [ -f ".roadmap/tech-stack.json" ]; then
-      npx ajv validate \
-        -s schemas/tech-stack.schema.json \
-        -d .roadmap/tech-stack.json
-    fi
-
-- name: Validate Workflow Registry (business-tools only)
-  if: github.repository == 'luh-tech/business-tools'
-  run: |
-    npx ajv validate \
-      -s schemas/portfolio/workflow-registry.schema.json \
-      -d config/workflow-registry.json
 ```
 
 ### Local Validation
@@ -234,71 +231,31 @@ Add to `.github/workflows/roadmap-ci.yml`:
 # Install ajv-cli
 npm install -g ajv-cli ajv-formats
 
-# Validate infrastructure catalog
-ajv validate -s schemas/infrastructure-catalog.schema.json -d .roadmap/infrastructure-catalog.json
-
-# Validate workflow registry
-ajv validate -s schemas/portfolio/workflow-registry.schema.json -d config/workflow-registry.json
-```
-
----
-
-## Migration Guide
-
-### Adding portfolioWorkflowsRef to Existing Catalogs
-
-For ventures with existing `infrastructure-catalog.json`:
-
-```json
-{
-  "catalog": {
-    "environments": [...],
-    "services": [...],
-    "workflows": [...],
-    "portfolioWorkflowsRef": {
-      "$ref": "https://raw.githubusercontent.com/luh-tech/business-tools/main/config/workflow-registry.json",
-      "description": "Portfolio-level workflows (validate, aggregate, generate) from business-tools",
-      "version": "1.0.0",
-      "lastVerified": "2025-12-12T00:00:00Z"
-    }
-  }
-}
-```
-
-### New File Creation
-
-For new ventures:
-
-```bash
-# Copy template files
-cp templates/infrastructure-catalog.json .roadmap/
-cp templates/tech-stack.json .roadmap/
-cp templates/decision-log.json .roadmap/
-mkdir -p .roadmap/evidence
+# Validate extensions
+ajv validate -s schemas/extensions.schema.v1.json -d .roadmap/extensions.json
 ```
 
 ---
 
 ## Changelog
 
+### v1.2.0 (2026-01-06)
+- **NEW**: `extensions.schema.v1.json` v1.0.0
+  - Venture-specific extensions with explicit share control
+  - Supports any JSON payload in `data` field
+  - Version tracking per extension
+- **NEW**: `portfolio/extensions-matrix.schema.v1.json` v1.0.0
+  - Aggregates shared extensions from all ventures
+  - Tracks which ventures share which extensions
+  - Summary statistics
+
 ### v1.1.0 (2025-12-12)
 - **NEW**: `portfolio/workflow-registry.schema.json` v1.0.0
-  - Workflow definitions with tool, command, dependencies
-  - Transformer mappings for slide generation
-  - Deck type composition rules
-  - Pipeline stage visualization
-  - Self-documenting `meta.schemaFirst` pattern
 - **UPDATED**: `infrastructure-catalog.schema.json` v1.1.0
   - Added `portfolioWorkflowsRef` for cross-repo workflow discovery
-  - Backward compatible (new field is optional)
 
 ### v1.0.0 (2025-12-11)
-- Initial release
-- `infrastructure-catalog.schema.json` v1.0.0
-- `tech-stack.schema.json` v1.0.0
-- `evidence-session.schema.json` v1.0.0
-- `decision-log.schema.v2.json` v2.0.0
-- `luhtech-enums.schema.v2.json` v2.0.0
+- Initial release with core schemas
 
 ---
 
@@ -313,5 +270,6 @@ mkdir -p .roadmap/evidence
 ✅ Backward compatible  
 ✅ Cross-repo reference pattern ($ref)  
 ✅ Self-documenting (meta.schemaFirst)  
+✅ Extension system with explicit sharing (NEW)  
 
 **No shortcuts. Enterprise excellence always.**
