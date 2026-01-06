@@ -103,9 +103,19 @@
       }
     },
 
+    "urn": {
+      "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/urn",
+      "description": "LuhTech URN identifier - see graph.schema.json for full spec"
+    },
+
+    "graphMetadata": {
+      "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/graphMetadata",
+      "description": "Graph traversal metadata - see graph.schema.json for full spec"
+    },
+
     "reference": {
       "type": "object",
-      "description": "Cross-schema reference",
+      "description": "Cross-schema reference (legacy - prefer URN for new schemas)",
       "required": ["type", "id"],
       "properties": {
         "type": {
@@ -116,6 +126,10 @@
         "id": {
           "type": "string",
           "description": "Target identifier"
+        },
+        "$id": {
+          "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/urn",
+          "description": "URN identifier (preferred)"
         },
         "schema": {
           "type": "string",
@@ -235,6 +249,10 @@
         "id": {
           "type": "string"
         },
+        "$id": {
+          "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/urn",
+          "description": "URN identifier for graph linking"
+        },
         "name": {
           "type": "string"
         },
@@ -253,6 +271,9 @@
         },
         "contact": {
           "$ref": "#/definitions/contact"
+        },
+        "graphMetadata": {
+          "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/graphMetadata"
         }
       }
     },
@@ -264,6 +285,10 @@
       "properties": {
         "id": {
           "type": "string"
+        },
+        "$id": {
+          "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/urn",
+          "description": "URN identifier for graph linking"
         },
         "name": {
           "type": "string"
@@ -292,6 +317,9 @@
         },
         "contact": {
           "$ref": "#/definitions/contact"
+        },
+        "graphMetadata": {
+          "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/graphMetadata"
         }
       }
     },
@@ -355,6 +383,11 @@
           "$ref": "#/definitions/tags"
         }
       }
+    },
+
+    "syncStatus": {
+      "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/syncStatus",
+      "description": "V3 sync metadata - see graph.schema.json for full spec"
     }
   }
 }
