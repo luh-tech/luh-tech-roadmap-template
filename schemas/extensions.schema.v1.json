@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://luhtech.dev/schemas/extensions-v1.json",
+  "title": "LuhTech Venture Extensions v1",
+  "description": "Venture-specific extensions with explicit sharing control. Each extension has a share flag determining visibility to Holdings aggregation.",
+  "type": "object",
+  "required": ["$schema", "ventureId", "extensions"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://luhtech.dev/schemas/extensions-v1.json"
+    },
+    "ventureId": {
+      "$ref": "https://luhtech.dev/schemas/enums.json#/definitions/ventureIdPattern",
+      "description": "Venture identifier"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last modification timestamp"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Named extension blocks with share control",
+      "additionalProperties": {
+        "$ref": "#/definitions/extensionBlock"
+      }
+    }
+  },
+  "definitions": {
+    "extensionBlock": {
+      "type": "object",
+      "description": "Single extension with sharing control",
+      "required": ["share", "data"],
+      "additionalProperties": false,
+      "properties": {
+        "share": {
+          "type": "boolean",
+          "description": "If true, this extension is visible to Holdings aggregation"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of this extension"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Extension version (semver)"
+        },
+        "data": {
+          "type": "object",
+          "description": "Extension payload - structure defined by venture",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}
