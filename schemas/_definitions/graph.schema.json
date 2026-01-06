@@ -8,10 +8,13 @@
       "type": "object",
       "description": "Schema metadata - not for validation",
       "properties": {
-        "version": {"const": "1.0.0"},
+        "version": {"const": "1.1.0"},
         "lastUpdated": {"const": "2026-01-06"},
         "maintainer": {"const": "LuhTech Enterprise Infrastructure"},
-        "basedOn": {"const": "V3 Ectropy URN Pattern"}
+        "basedOn": {"const": "V3 Ectropy URN Pattern"},
+        "changelog": {
+          "const": "1.1.0: Added node, deliverable, workstream, document node types"
+        }
       }
     },
 
@@ -24,7 +27,9 @@
         "urn:luhtech:ectropy:decision:d-2026-01-01-database-ha-upgrade",
         "urn:luhtech:ectropy:service:mcp-server",
         "urn:luhtech:jobsitecontrol:milestone:ms-hardware-v1",
-        "urn:luhtech:holdings:venture:ectropy"
+        "urn:luhtech:holdings:venture:ectropy",
+        "urn:luhtech:ectropy:deliverable:demo-environment",
+        "urn:luhtech:ectropy:node:p5a-infrastructure"
       ]
     },
 
@@ -66,7 +71,11 @@
         "phase",
         "task",
         "metric",
-        "extension"
+        "extension",
+        "node",
+        "deliverable",
+        "workstream",
+        "document"
       ]
     },
 
