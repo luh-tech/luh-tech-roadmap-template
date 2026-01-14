@@ -25,6 +25,8 @@ This schema system provides standardized infrastructure documentation for the Lu
 
 | Schema | Version | Size | Purpose |
 |--------|---------|------|---------|
+| `roadmap.schema.v2.2.json` | v2.2.0 | ~25KB | **LATEST** - Venture roadmap with resources block, vendor-agnostic features |
+| `roadmap.schema.v2.1.json` | v2.1.0 | ~19KB | Features array, releases tracking |
 | `roadmap.schema.v2.json` | v2.0.0 | ~19KB | Venture roadmap, quarters, financials, milestones |
 | `venture-summary.schema.json` | v1.0.0 | ~11KB | Investor pitch summary |
 | `decision-log.schema.v2.json` | v2.0.0 | ~10KB | Enhanced ADR with voting, indexes, implementation tracking |
@@ -345,6 +347,19 @@ ajv validate -s schemas/portfolio/portfolio-graph.schema.v1.json -d .roadmap/por
 ---
 
 ## Changelog
+
+### v1.4.0 (2026-01-14)
+- **NEW**: `roadmap.schema.v2.2.json` v2.2.0
+  - Added `resources` block (compute, storage, bandwidth, physical, personnel)
+  - Added `schemaChangelog` to meta for version tracking
+  - Added `inheritedFrom` field for cross-venture feature inheritance
+  - Added `vendorEvaluation` for vendor-agnostic features
+  - Added `subdomainPattern` for multi-tenant features
+  - Added `notes` field for implementation notes
+  - Added new feature categories: `hardware`, `mobile`, `marketplace`
+  - Added `future` status for deferred features
+  - **DEPRECATED**: `financials`, `team`, `competitive` (move to roadmap-business.json)
+  - Added `resourceItem` definition for infrastructure planning
 
 ### v1.3.0 (2026-01-06)
 - **NEW**: `_definitions/graph.schema.json` v1.0.0
