@@ -1,0 +1,38 @@
+{
+  "$schema": "https://luhtech.dev/schemas/dependencies.json",
+  "version": "1.0.0",
+  "ventureId": "venture-id",
+  "lastUpdated": "2026-01-01T00:00:00Z",
+  "dependencies": [
+    {
+      "id": "dep-example-platform",
+      "type": "venture",
+      "targetVentureId": "ectropy",
+      "description": "Example: Shared authentication and platform services from Ectropy",
+      "blocking": false,
+      "status": "pending",
+      "requiredBy": "2026-03-31",
+      "impact": "high",
+      "notes": "Replace with actual dependencies or remove if none"
+    }
+  ],
+  "provides": [
+    {
+      "id": "prov-example-api",
+      "type": "api",
+      "description": "Example: API endpoint this venture provides to others",
+      "consumedBy": [],
+      "status": "planned"
+    }
+  ],
+  "templates": [
+    {
+      "templateId": "luh-tech-roadmap-template",
+      "version": "2.2.0",
+      "status": "applied",
+      "appliedOn": "2026-01-01",
+      "customizations": []
+    }
+  ],
+  "sharedResources": []
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://luhtech.dev/schemas/venture-summary.json",
+  "version": "1.0.0",
+  "lastUpdated": "2026-01-01T00:00:00Z",
+  "venture": {
+    "id": "venture-id",
+    "name": "Venture Name",
+    "tagline": "Tagline description",
+    "stage": "pre-seed",
+    "founded": "2026-01-01",
+    "domain": "example.com",
+    "industry": ["Construction", "Technology"],
+    "location": "San Francisco, CA"
+  },
+  "pitch": {
+    "problem": {
+      "headline": "PROBLEM_HEADLINE",
+      "subheadline": "PROBLEM_SUBHEADLINE",
+      "bullets": [
+        "Problem point 1",
+        "Problem point 2",
+        "Problem point 3"
+      ],
+      "narrative": "PROBLEM_NARRATIVE"
+    },
+    "solution": {
+      "headline": "SOLUTION_HEADLINE",
+      "subheadline": "SOLUTION_SUBHEADLINE",
+      "bullets": [
+        "Solution point 1",
+        "Solution point 2",
+        "Solution point 3"
+      ],
+      "narrative": "SOLUTION_NARRATIVE"
+    },
+    "market": {
+      "headline": "MARKET_HEADLINE",
+      "tam": {
+        "value": "$0B",
+        "description": "Total Addressable Market description"
+      },
+      "sam": {
+        "value": "$0B",
+        "description": "Serviceable Addressable Market description"
+      },
+      "som": {
+        "value": "$0M",
+        "description": "Serviceable Obtainable Market description"
+      },
+      "growthRate": "0% CAGR"
+    },
+    "businessModel": {
+      "headline": "BUSINESS_MODEL_HEADLINE",
+      "revenueModel": "SaaS subscription",
+      "pricing": []
+    },
+    "differentiator": {
+      "headline": "DIFFERENTIATOR_HEADLINE",
+      "subheadline": "DIFFERENTIATOR_SUBHEADLINE",
+      "bullets": []
+    },
+    "traction": {
+      "headline": "TRACTION_HEADLINE",
+      "metrics": [],
+      "customers": [],
+      "testimonials": []
+    },
+    "ask": {
+      "headline": "THE_ASK",
+      "amount": "$0",
+      "useOfFunds": []
+    }
+  },
+  "metrics": {
+    "customers": 0,
+    "custom": {}
+  },
+  "team": {
+    "size": 1,
+    "founders": []
+  },
+  "milestones": {
+    "achieved": [],
+    "upcoming": []
+  },
+  "assets": {
+    "colors": {
+      "primary": "#1E3A5F",
+      "secondary": "#4A90A4",
+      "accent": "#F5A623"
+    },
+    "fonts": {
+      "heading": "Montserrat",
+      "body": "Open Sans"
+    }
+  }
+}

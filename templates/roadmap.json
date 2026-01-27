@@ -1,0 +1,74 @@
+{
+  "$schema": "https://luhtech.dev/schemas/roadmap-v2.2.json",
+  "schemaVersion": "2.2.0",
+  "meta": {
+    "ventureId": "venture-id",
+    "ventureName": "Venture Name",
+    "lastUpdated": "2026-01-01T00:00:00Z",
+    "author": "author",
+    "status": "pre-formation",
+    "sourceDoc": ".roadmap/roadmap.json"
+  },
+  "venture": {
+    "type": "Platform",
+    "architecture": "Cloud-First",
+    "forkParent": null,
+    "codeReuse": 0,
+    "platformProgress": "0%",
+    "currentPhase": "Foundation"
+  },
+  "pitch": {
+    "oneLiner": "ONE_LINER_DESCRIPTION",
+    "problem": "PROBLEM_STATEMENT",
+    "solution": "SOLUTION_STATEMENT",
+    "market": "MARKET_DESCRIPTION",
+    "differentiator": "DIFFERENTIATOR",
+    "businessModel": "BUSINESS_MODEL"
+  },
+  "quarters": {
+    "q1_2026": {
+      "focus": "Foundation",
+      "theme": "Initial setup and architecture decisions",
+      "phases": ["Foundation"],
+      "status": "planned",
+      "milestones": [
+        {
+          "date": "2026-03-31",
+          "event": "Foundation Complete",
+          "gate": true,
+          "status": "planned"
+        }
+      ],
+      "deliverables": [
+        {
+          "name": "Initial Setup",
+          "owner": "team",
+          "status": "planned"
+        }
+      ],
+      "metrics": {},
+      "resources": {
+        "team": 1,
+        "budget": "$0"
+      },
+      "risks": [],
+      "dependencies": [],
+      "erikHours": 0
+    }
+  },
+  "keyMilestones": [
+    {
+      "id": "foundation",
+      "date": "2026-03-31",
+      "event": "Foundation Complete",
+      "gate": true,
+      "status": "planned"
+    }
+  ],
+  "erikAllocation": {
+    "currentHoursPerWeek": 0,
+    "quarterlyBreakdown": {
+      "q1_2026": 0
+    }
+  }
+}

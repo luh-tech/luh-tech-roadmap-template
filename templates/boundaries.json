@@ -1,0 +1,38 @@
+{
+  "$schema": "https://luhtech.dev/schemas/boundaries-v1.json",
+  "version": "1.0.0",
+  "venture": "venture-id",
+  "lastUpdated": "2026-01-01T00:00:00Z",
+  "forkedFrom": {
+    "repo": "luhtech/Ectropy",
+    "branch": "main",
+    "commitHash": "0000000000000000000000000000000000000000",
+    "date": "2026-01-01T00:00:00Z",
+    "tag": null
+  },
+  "inherited": [
+    "packages/**",
+    "libs/**"
+  ],
+  "removed": [],
+  "added": [
+    ".roadmap/**",
+    "apps/venture-id/**"
+  ],
+  "modified": [
+    {
+      "path": "apps/venture-id/",
+      "reason": "Venture-specific application code",
+      "syncStrategy": "manual"
+    }
+  ],
+  "upstreamSync": {
+    "enabled": false,
+    "branches": ["main"],
+    "excludePaths": [".roadmap/**", "apps/venture-id/**"],
+    "frequency": "manual",
+    "lastSync": null,
+    "lastSyncCommit": null
+  },
+  "codeReuse": 0
+}
