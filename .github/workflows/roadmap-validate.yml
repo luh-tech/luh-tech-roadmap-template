@@ -148,7 +148,7 @@ jobs:
           echo "PHASE 2: Infrastructure Documentation"
           echo "====================================="
           
-          # tech-stack.json (OPTIONAL) - show errors for debugging
+          # tech-stack.json (OPTIONAL)
           if [ -f "$ROADMAP_DIR/tech-stack.json" ]; then
             if [ -f "$SCHEMA_DIR/tech-stack.schema.json" ]; then
               if ajv validate -s "$SCHEMA_DIR/tech-stack.schema.json" -d "$ROADMAP_DIR/tech-stack.json" -r "$ENUM_SCHEMA" -r "$ENUM_SCHEMA_V2" -r "$DEFINITIONS_SCHEMA" --spec=draft7 -c ajv-formats; then
@@ -178,12 +178,149 @@ jobs:
             echo "SKIP infrastructure-catalog.json"; SKIPPED=$((SKIPPED + 1))
           fi
           
+          # architecture.json (OPTIONAL)
+          if [ -f "$ROADMAP_DIR/architecture.json" ]; then
+            if [ -f "$SCHEMA_DIR/architecture-roadmap.schema.v1.json" ]; then
+              if ajv validate -s "$SCHEMA_DIR/architecture-roadmap.schema.v1.json" -d "$ROADMAP_DIR/architecture.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
+                echo "PASS architecture.json"; PASSED=$((PASSED + 1))
+              else
+                echo "FAIL architecture.json"; FAILED=$((FAILED + 1))
+              fi
+            else
+              echo "SKIP architecture.json (schema missing)"; SKIPPED=$((SKIPPED + 1))
+            fi
+          else
+            echo "SKIP architecture.json"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
+          # extensions.json (OPTIONAL)
+          if [ -f "$ROADMAP_DIR/extensions.json" ]; then
+            if [ -f "$SCHEMA_DIR/extensions.schema.v1.json" ]; then
+              if ajv validate -s "$SCHEMA_DIR/extensions.schema.v1.json" -d "$ROADMAP_DIR/extensions.json" --spec=draft7 -c ajv-formats; then
+                echo "PASS extensions.json"; PASSED=$((PASSED + 1))
+              else
+                echo "FAIL extensions.json"; FAILED=$((FAILED + 1))
+              fi
+            else
+              echo "SKIP extensions.json (schema missing)"; SKIPPED=$((SKIPPED + 1))
+            fi
+          else
+            echo "SKIP extensions.json"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
           # evidence/ directory (SKIP - individual nodes not validated, container schema only)
           if [ -d "$ROADMAP_DIR/evidence" ]; then
             EVIDENCE_COUNT=$(find "$ROADMAP_DIR/evidence" -name "*.json" 2>/dev/null | wc -l)
             echo "SKIP evidence/ ($EVIDENCE_COUNT files - container schema only)"; SKIPPED=$((SKIPPED + 1))
           else
             echo "SKIP evidence/"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
+          echo ""
+          echo "PHASE 3: Business Documentation (Optional)"
+          echo "==========================================="
+          
+          # roadmap-business.json (OPTIONAL - advanced business documentation)
+          if [ -f "$ROADMAP_DIR/roadmap-business.json" ]; then
+            if [ -f "$SCHEMA_DIR/roadmap-business.schema.json" ]; then
+              if ajv validate -s "$SCHEMA_DIR/roadmap-business.schema.json" -d "$ROADMAP_DIR/roadmap-business.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
+                echo "PASS roadmap-business.json"; PASSED=$((PASSED + 1))
+              else
+                echo "FAIL roadmap-business.json"; FAILED=$((FAILED + 1))
+              fi
+            else
+              echo "SKIP roadmap-business.json (schema missing)"; SKIPPED=$((SKIPPED + 1))
+            fi
+          else
+            echo "SKIP roadmap-business.json"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
+          # workflow-registry.json (OPTIONAL - CI/CD documentation)
+          if [ -f "$ROADMAP_DIR/workflow-registry.json" ]; then
+            if [ -f "$SCHEMA_DIR/workflow-registry.schema.json" ]; then
+              if ajv validate -s "$SCHEMA_DIR/workflow-registry.schema.json" -d "$ROADMAP_DIR/workflow-registry.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
+                echo "PASS workflow-registry.json"; PASSED=$((PASSED + 1))
+              else
+                echo "FAIL workflow-registry.json"; FAILED=$((FAILED + 1))
+              fi
+            else
+              echo "SKIP workflow-registry.json (schema missing)"; SKIPPED=$((SKIPPED + 1))
+            fi
+          else
+            echo "SKIP workflow-registry.json"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
+          # metrics-pipeline.json (OPTIONAL - observability configuration)
+          if [ -f "$ROADMAP_DIR/metrics-pipeline.json" ]; then
+            if [ -f "$SCHEMA_DIR/metrics-pipeline.schema.json" ]; then
+              if ajv validate -s "$SCHEMA_DIR/metrics-pipeline.schema.json" -d "$ROADMAP_DIR/metrics-pipeline.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
+                echo "PASS metrics-pipeline.json"; PASSED=$((PASSED + 1))
+              else
+                echo "FAIL metrics-pipeline.json"; FAILED=$((FAILED + 1))
+              fi
+            else
+              echo "SKIP metrics-pipeline.json (schema missing)"; SKIPPED=$((SKIPPED + 1))
+            fi
+          else
+            echo "SKIP metrics-pipeline.json"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
+          # deployment-metrics.json (OPTIONAL - Watchtower deployment tracking)
+          if [ -f "$ROADMAP_DIR/deployment-metrics.json" ]; then
+            if [ -f "$SCHEMA_DIR/deployment-metrics.schema.json" ]; then
+              if ajv validate -s "$SCHEMA_DIR/deployment-metrics.schema.json" -d "$ROADMAP_DIR/deployment-metrics.json" --spec=draft7 -c ajv-formats; then
+                echo "PASS deployment-metrics.json"; PASSED=$((PASSED + 1))
+              else
+                echo "FAIL deployment-metrics.json"; FAILED=$((FAILED + 1))
+              fi
+            else
+              echo "SKIP deployment-metrics.json (schema missing)"; SKIPPED=$((SKIPPED + 1))
+            fi
+          else
+            echo "SKIP deployment-metrics.json"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
+          # interfaces.json (OPTIONAL - MCP tools and API definitions)
+          if [ -f "$ROADMAP_DIR/interfaces.json" ]; then
+            if [ -f "$SCHEMA_DIR/interfaces.schema.json" ]; then
+              if ajv validate -s "$SCHEMA_DIR/interfaces.schema.json" -d "$ROADMAP_DIR/interfaces.json" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats; then
+                echo "PASS interfaces.json"; PASSED=$((PASSED + 1))
+              else
+                echo "FAIL interfaces.json"; FAILED=$((FAILED + 1))
+              fi
+            else
+              echo "SKIP interfaces.json (schema missing)"; SKIPPED=$((SKIPPED + 1))
+            fi
+          else
+            echo "SKIP interfaces.json"; SKIPPED=$((SKIPPED + 1))
+          fi
+          
+          # features/ directory (OPTIONAL - feature specifications)
+          if [ -d "$ROADMAP_DIR/features" ]; then
+            FEATURE_COUNT=$(find "$ROADMAP_DIR/features" -name "*.json" 2>/dev/null | wc -l)
+            if [ "$FEATURE_COUNT" -gt 0 ] && [ -f "$SCHEMA_DIR/feature.schema.json" ]; then
+              FEATURE_PASSED=0
+              FEATURE_FAILED=0
+              for feature_file in "$ROADMAP_DIR/features"/*.json; do
+                if [ -f "$feature_file" ]; then
+                  FEATURE_NAME=$(basename "$feature_file")
+                  if ajv validate -s "$SCHEMA_DIR/feature.schema.json" -d "$feature_file" -r "$ENUM_SCHEMA" --spec=draft7 -c ajv-formats 2>/dev/null; then
+                    echo "  PASS features/$FEATURE_NAME"; FEATURE_PASSED=$((FEATURE_PASSED + 1))
+                  else
+                    echo "  FAIL features/$FEATURE_NAME"; FEATURE_FAILED=$((FEATURE_FAILED + 1))
+                  fi
+                fi
+              done
+              if [ "$FEATURE_FAILED" -eq 0 ]; then
+                echo "PASS features/ ($FEATURE_PASSED files)"; PASSED=$((PASSED + 1))
+              else
+                echo "FAIL features/ ($FEATURE_FAILED of $FEATURE_COUNT failed)"; FAILED=$((FAILED + 1))
+              fi
+            else
+              echo "SKIP features/ ($FEATURE_COUNT files - schema missing)"; SKIPPED=$((SKIPPED + 1))
+            fi
+          else
+            echo "SKIP features/"; SKIPPED=$((SKIPPED + 1))
           fi
           
           echo ""
@@ -213,8 +350,21 @@ jobs:
           echo "file-count=$PASSED" >> $GITHUB_OUTPUT
           
           echo "## Roadmap Validation: ${{ inputs.venture-id }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Schema Version:** ${{ inputs.schema-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
           echo "| Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
           echo "| Skipped | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Validation Phases" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Phase | Description | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 1 | Core Roadmap Files | Required |" >> $GITHUB_STEP_SUMMARY
+          echo "| 2 | Infrastructure Documentation | Optional |" >> $GITHUB_STEP_SUMMARY
+          echo "| 3 | Business Documentation | Optional |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "*Enterprise Excellence. Schema-First. No Shortcuts.*" >> $GITHUB_STEP_SUMMARY
