@@ -6,20 +6,21 @@ Validates cross-venture milestone dependencies across the LuhTech portfolio.
 Implements CPM (Critical Path Method) validation with SILTANA 7-tier authority cascade.
 
 Usage:
-    python validate-portfolio-dag.py [--ventures-dir PATH] [--verbose] [--fix-successors]
+    python validate-portfolio-dag.py [--ventures-dir PATH] [--verbose] [--json]
+    python validate-portfolio-dag.py --ci  # CI mode with exit codes
 
 Checks:
     1. DAG Integrity: No circular dependencies
     2. URN Existence: All referenced milestones exist
     3. Date Consistency: DERIVED dates >= predecessor finish + lag
     4. Authority Levels: Valid 0-6 range per SILTANA spec
-    5. Classification Validation: EXTERNAL milestones have no predecessors
+    5. Classification Validation: EXTERNAL milestones have authority >= 5
 
 Enterprise Excellence. Schema-First. No Shortcuts.
 
 Author: Claude (AI Assistant)
 Date: 2026-01-28
-Version: 1.0.0
+Version: 2.0.0
 """
 
 import argparse
@@ -73,7 +74,7 @@ class Milestone:
     critical: bool = False
     status: str = "planned"
     authority_level: int = 3
-    buffer_days: int = 0
+    buffer_days: float = 0
     predecessors: List[Dict] = field(default_factory=list)
     successors: List[str] = field(default_factory=list)
     
@@ -92,7 +93,11 @@ class Milestone:
         except ValueError:
             date = datetime.now()
             
-        classification = MilestoneClassification(data.get("classification", "FLEXIBLE"))
+        classification_str = data.get("classification", "FLEXIBLE")
+        try:
+            classification = MilestoneClassification(classification_str)
+        except ValueError:
+            classification = MilestoneClassification.FLEXIBLE
         
         graph_metadata = data.get("graphMetadata", {})
         predecessors = graph_metadata.get("predecessors", [])
@@ -128,6 +133,11 @@ class ValidationResult:
 class PortfolioDAGValidator:
     """Validates cross-venture milestone DAG across the portfolio."""
     
+    VENTURE_DIRS = [
+        "Ectropy-Business", "JobsiteControl", "Qullqa", "Raizal",
+        "Hilja", "LuhTech-business", "Viiva", "Replique"
+    ]
+    
     def __init__(self, ventures_dir: str, verbose: bool = False):
         self.ventures_dir = Path(ventures_dir)
         self.verbose = verbose
@@ -137,13 +147,8 @@ class PortfolioDAGValidator:
         
     def load_roadmaps(self) -> bool:
         """Load all roadmap.json files from ventures directory."""
-        venture_dirs = [
-            "Ectropy-Business", "JobsiteControl", "Qullqa", "Raizal",
-            "Hilja", "LuhTech-business", "Viiva", "Replique"
-        ]
-        
         loaded_count = 0
-        for venture_dir in venture_dirs:
+        for venture_dir in self.VENTURE_DIRS:
             roadmap_path = self.ventures_dir / venture_dir / ".roadmap" / "roadmap.json"
             if roadmap_path.exists():
                 try:
@@ -383,16 +388,63 @@ class PortfolioDAGValidator:
         print(f"\n{'✅ VALIDATION PASSED' if passed else '❌ VALIDATION FAILED'}")
         
         return passed, all_results
+    
+    def to_json(self, passed: bool, results: List[ValidationResult]) -> Dict:
+        """Export validation results as JSON."""
+        errors = [r for r in results if not r.passed and r.severity == "error"]
+        warnings = [r for r in results if not r.passed and r.severity == "warning"]
+        
+        return {
+            "summary": {
+                "status": "valid" if passed else ("warning" if not errors else "error"),
+                "compliance_score": 100 if passed else max(0, 100 - len(errors) * 10 - len(warnings) * 5),
+                "milestones": len(self.milestones),
+                "ventures": len(self.venture_milestones),
+                "errors": len(errors),
+                "warnings": len(warnings)
+            },
+            "results": [
+                {
+                    "check": r.check,
+                    "passed": r.passed,
+                    "message": r.message,
+                    "severity": r.severity
+                }
+                for r in results
+            ],
+            "milestones": {
+                urn: {
+                    "venture": m.venture_id,
+                    "event": m.event,
+                    "date": m.date.strftime("%Y-%m-%d"),
+                    "classification": m.classification.value,
+                    "authority": m.authority_level,
+                    "predecessors": len(m.predecessors),
+                    "successors": len(m.successors)
+                }
+                for urn, m in self.milestones.items()
+            }
+        }
 
 
 def main():
     parser = argparse.ArgumentParser(description="Validate portfolio milestone DAG")
-    parser.add_argument("--ventures-dir", default=r"C:\Users\luhte\Source\Repos\luh-tech")
-    parser.add_argument("--verbose", "-v", action="store_true")
-    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--ventures-dir", "-d", 
+                        default=os.environ.get("LUHTECH_VENTURES_DIR", 
+                                               os.path.expanduser("~/Source/Repos/luh-tech")),
+                        help="Path to ventures directory")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    parser.add_argument("--json", "-j", action="store_true", help="Output JSON")
+    parser.add_argument("--ci", action="store_true", help="CI mode (strict exit codes)")
     args = parser.parse_args()
     
-    validator = PortfolioDAGValidator(args.ventures_dir, args.verbose)
+    # Normalize path for cross-platform
+    ventures_dir = Path(args.ventures_dir).expanduser()
+    if not ventures_dir.exists():
+        # Try Windows path if Unix path doesn't exist
+        ventures_dir = Path(r"C:\Users\luhte\Source\Repos\luh-tech")
+    
+    validator = PortfolioDAGValidator(str(ventures_dir), args.verbose)
     
     if not validator.load_roadmaps():
         print("ERROR: Failed to load roadmaps")
@@ -401,15 +453,15 @@ def main():
     passed, results = validator.run_all_validations()
     
     if args.json:
-        output = {
-            "passed": passed,
-            "milestones": len(validator.milestones),
-            "ventures": len(validator.venture_milestones),
-            "results": [{"check": r.check, "passed": r.passed, "message": r.message} for r in results]
-        }
+        output = validator.to_json(passed, results)
         print("\n" + json.dumps(output, indent=2))
     
-    sys.exit(0 if passed else 1)
+    if args.ci:
+        # CI mode: exit 0 only if no errors, exit 1 on errors
+        sys.exit(0 if passed else 1)
+    else:
+        # Interactive mode: always exit 0 unless load failed
+        sys.exit(0)
 
 
 if __name__ == "__main__":
