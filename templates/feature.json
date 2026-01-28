@@ -1,0 +1,87 @@
+{
+  "$schema": "../schemas/feature.schema.json",
+  "$id": "urn:luhtech:example:feature:example-feature",
+  "featureId": "example-feature",
+  "name": "Example Feature",
+  "version": "0.1.0",
+  "status": "PLANNED",
+  "priority": "MEDIUM",
+  "owner": "Team Lead",
+  "repository": "luh-tech/venture-repo",
+  "branch": "main",
+  "targetRelease": "2026-06-30",
+  "schemaVersion": "1.0.0",
+  "meta": {
+    "sourceOfTruth": ".roadmap/features/example-feature/FEATURE.json",
+    "lastUpdated": "2026-01-27T00:00:00Z"
+  },
+  "description": "This is an example feature template that demonstrates the structure required for feature specification files. Replace this description with details about your specific feature, including its purpose, scope, and expected outcomes.",
+  "coreInnovation": {
+    "before": {
+      "state": "Manual process requiring significant effort",
+      "pain": "Time-consuming, error-prone"
+    },
+    "after": {
+      "state": "Automated workflow with validation",
+      "benefit": "Faster, more reliable"
+    }
+  },
+  "value": {
+    "estimatedSavings": "$50K",
+    "roi": "200%",
+    "incidentsAvoided": 10,
+    "timeReduction": "4 hours/week",
+    "systemCost": "$10K"
+  },
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "Planning & Design",
+      "targetDate": "2026-03-01",
+      "status": "NOT_STARTED",
+      "description": "Complete feature planning and technical design",
+      "deliverables": ["Technical design document", "API specification", "Test plan"],
+      "completionCriteria": ["Design reviewed and approved", "API spec published"]
+    },
+    {
+      "id": "M2",
+      "name": "Implementation",
+      "targetDate": "2026-04-15",
+      "status": "NOT_STARTED",
+      "description": "Implement core functionality",
+      "deliverables": ["Core module implementation", "Unit tests", "Integration tests"],
+      "completionCriteria": ["All tests passing", "Code review completed"]
+    },
+    {
+      "id": "M3",
+      "name": "Release",
+      "targetDate": "2026-06-30",
+      "status": "NOT_STARTED",
+      "description": "Production release and documentation",
+      "deliverables": ["Production deployment", "User documentation", "Release notes"],
+      "completionCriteria": ["Deployed to production", "Documentation published"]
+    }
+  ],
+  "dependencies": {
+    "schemas": ["feature.schema.json"],
+    "services": ["api-gateway"],
+    "features": [],
+    "external": []
+  },
+  "scenarios": [
+    {
+      "name": "Standard Usage",
+      "description": "Normal workflow execution",
+      "frequency": "Daily",
+      "traditionalCost": "$500",
+      "withFeatureCost": "$100",
+      "savingsPerIncident": "$400",
+      "annualSavings": "$146K"
+    }
+  ],
+  "graphMetadata": {
+    "nodeType": "Feature",
+    "inEdges": [],
+    "outEdges": []
+  }
+}
