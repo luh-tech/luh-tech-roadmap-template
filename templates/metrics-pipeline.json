@@ -1,0 +1,84 @@
+{
+  "$schema": "../schemas/metrics-pipeline.schema.json",
+  "version": "1.0.0",
+  "lastUpdated": "2026-01-27T00:00:00Z",
+  "sources": {
+    "github-api": {
+      "id": "github-api",
+      "type": "github-api",
+      "endpoint": "https://api.github.com",
+      "authentication": {"type": "github-token", "secretRef": "GITHUB_TOKEN"},
+      "criticality": "important",
+      "timeout": 30,
+      "retries": 3,
+      "healthCheck": {"endpoint": "https://api.github.com/rate_limit", "expectedStatus": 200, "interval": "5m"},
+      "fallback": {"type": "cache", "cacheMaxAge": "1h"}
+    },
+    "prometheus": {
+      "id": "prometheus",
+      "type": "prometheus",
+      "endpoint": "http://prometheus:9090",
+      "authentication": {"type": "none"},
+      "criticality": "critical",
+      "timeout": 30,
+      "retries": 3,
+      "healthCheck": {"endpoint": "http://prometheus:9090/-/healthy", "expectedStatus": 200, "interval": "1m"},
+      "fallback": {"type": "placeholder", "placeholderMessage": "Prometheus metrics unavailable"}
+    }
+  },
+  "destinations": {
+    "github-step-summary": {
+      "id": "github-step-summary",
+      "type": "github-step-summary",
+      "priority": "required",
+      "config": {"format": "markdown"},
+      "filters": {"onSuccess": true, "onWarning": true, "onFailure": true},
+      "format": {"template": "default", "includeMetrics": ["all"]}
+    },
+    "slack": {
+      "id": "slack",
+      "type": "slack",
+      "priority": "best-effort",
+      "config": {"webhookSecretRef": "SLACK_WEBHOOK_URL", "channel": "#metrics"},
+      "filters": {"onSuccess": false, "onWarning": true, "onFailure": true, "minSeverity": "warning"},
+      "format": {"template": "slack-blocks"}
+    },
+    "file-commit": {
+      "id": "file-commit",
+      "type": "file-commit",
+      "priority": "best-effort",
+      "config": {"path": ".roadmap/metrics/latest.json", "branch": "main"},
+      "filters": {"onSuccess": true, "onWarning": true, "onFailure": false}
+    }
+  },
+  "failureMatrix": {
+    "github-api": {
+      "sourceId": "github-api",
+      "scenarios": [
+        {"condition": "rate-limited", "action": "use-cache", "workflowResult": "warning", "message": "GitHub API rate limited, using cached data", "notify": ["slack"]},
+        {"condition": "authentication-failed", "action": "fail", "workflowResult": "failure", "message": "GitHub authentication failed - check GITHUB_TOKEN", "notify": ["slack", "github-step-summary"]},
+        {"condition": "connection-timeout", "action": "retry", "workflowResult": "warning", "message": "GitHub API timeout, retrying..."}
+      ]
+    },
+    "prometheus": {
+      "sourceId": "prometheus",
+      "scenarios": [
+        {"condition": "connection-refused", "action": "use-placeholder", "workflowResult": "warning", "message": "Prometheus unavailable", "notify": ["slack"]},
+        {"condition": "server-error", "action": "retry", "workflowResult": "warning", "message": "Prometheus server error, retrying..."}
+      ]
+    }
+  },
+  "normalization": {
+    "resultMapping": {
+      "success": {"githubStatus": "success", "icon": "✅", "meaning": "All metrics collected successfully"},
+      "warning": {"githubStatus": "success", "icon": "⚠️", "meaning": "Completed with some data sources unavailable"},
+      "failure": {"githubStatus": "failure", "icon": "❌", "meaning": "Critical metrics collection failed"},
+      "skipped": {"githubStatus": "success", "icon": "⏭️", "meaning": "Skipped due to conditions"}
+    },
+    "summaryFormat": {"includeTimestamp": true, "includeSourceStatus": true, "includeMetricsTable": true, "includeFailureDetails": true},
+    "slackFormat": {"successColor": "good", "warningColor": "warning", "failureColor": "danger", "includeViewLogsButton": true}
+  },
+  "workflows": [
+    {"file": "ops-metrics.yml", "name": "Metrics Collection", "schedule": "0 */6 * * *", "sources": ["github-api", "prometheus"], "destinations": ["github-step-summary", "slack", "file-commit"], "failureMode": "collect-all"}
+  ]
+}
