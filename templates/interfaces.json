@@ -1,0 +1,88 @@
+{
+  "$schema": "../schemas/interfaces.schema.json",
+  "$id": "urn:luhtech:example:interfaces:example-feature",
+  "schemaVersion": "1.0.0",
+  "meta": {
+    "ventureId": "example-venture",
+    "featureId": "example-feature",
+    "createdAt": "2026-01-27T00:00:00Z",
+    "lastUpdated": "2026-01-27T00:00:00Z",
+    "author": "Team Lead",
+    "sourceDoc": ".roadmap/features/example-feature/interfaces.json"
+  },
+  "summary": "Interface definitions for Example Feature including MCP tools, REST API endpoints, and event specifications.",
+  "mcpTools": {
+    "totalCount": 2,
+    "categories": [
+      {
+        "name": "Feature Operations",
+        "description": "Core operations for the feature",
+        "tools": [
+          {
+            "name": "example_create",
+            "description": "Create a new example resource",
+            "authorityRequired": 2,
+            "input": {
+              "name": {"type": "string", "required": true, "minLength": 1, "maxLength": 100, "description": "Name of the resource"},
+              "data": {"type": "object", "required": false, "description": "Optional configuration data"}
+            },
+            "output": {"id": "string", "name": "string", "createdAt": "date-time", "status": "string"},
+            "errors": [{"code": "INVALID_INPUT", "description": "Input validation failed"}, {"code": "ALREADY_EXISTS", "description": "Resource with this name already exists"}],
+            "rateLimit": {"requests": 100, "window": "1m"}
+          },
+          {
+            "name": "example_get",
+            "description": "Retrieve an example resource by ID",
+            "authorityRequired": 1,
+            "input": {"id": {"type": "string", "required": true, "pattern": "^[a-z0-9-]+$", "description": "Resource ID"}},
+            "output": {"id": "string", "name": "string", "data": "object", "createdAt": "date-time", "updatedAt": "date-time"},
+            "errors": [{"code": "NOT_FOUND", "description": "Resource not found"}]
+          }
+        ]
+      }
+    ]
+  },
+  "restApi": {
+    "basePath": "/api/v2/examples",
+    "endpoints": [
+      {
+        "method": "POST",
+        "path": "/",
+        "description": "Create a new example resource",
+        "auth": "required",
+        "authorityRequired": 2,
+        "request": {"body": {"name": "string (required)", "data": "object (optional)"}},
+        "response": {"200": {"id": "string", "name": "string", "createdAt": "date-time"}, "400": {"error": "string", "details": "object"}, "401": {"error": "Unauthorized"}}
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "description": "Get an example resource by ID",
+        "auth": "required",
+        "authorityRequired": 1,
+        "request": {"params": {"id": "string"}},
+        "response": {"200": {"id": "string", "name": "string", "data": "object"}, "404": {"error": "Not found"}}
+      }
+    ]
+  },
+  "events": [
+    {
+      "name": "EXAMPLE_CREATED",
+      "description": "Emitted when a new example resource is created",
+      "payload": {"id": "string", "name": "string", "createdBy": "string", "timestamp": "date-time"},
+      "emittedBy": ["example_create", "POST /api/v2/examples"]
+    },
+    {
+      "name": "EXAMPLE_UPDATED",
+      "description": "Emitted when an example resource is updated",
+      "payload": {"id": "string", "changes": "object", "updatedBy": "string", "timestamp": "date-time"},
+      "emittedBy": ["PUT /api/v2/examples/:id"]
+    }
+  ],
+  "dataTypes": {
+    "ExampleResource": {
+      "description": "An example resource object",
+      "fields": {"id": "string - unique identifier", "name": "string - display name", "data": "object - custom data", "createdAt": "date-time - creation timestamp", "updatedAt": "date-time - last update timestamp"}
+    }
+  }
+}
