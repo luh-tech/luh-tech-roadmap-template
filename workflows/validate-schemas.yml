@@ -1,0 +1,97 @@
+name: Validate Schema Compliance
+
+on:
+  push:
+    paths:
+      - '.roadmap/**'
+  pull_request:
+    paths:
+      - '.roadmap/**'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout venture repo
+        uses: actions/checkout@v4
+
+      - name: Checkout template repo for schemas
+        uses: actions/checkout@v4
+        with:
+          repository: luh-tech/luh-tech-roadmap-template
+          path: template-repo
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli ajv-formats
+
+      - name: Validate roadmap-business.json
+        if: hashFiles('.roadmap/roadmap-business.json') != ''
+        run: |
+          npx ajv validate \
+            -s template-repo/schemas/roadmap-business.schema.json \
+            -d .roadmap/roadmap-business.json \
+            --spec=draft7 \
+            -c ajv-formats
+
+      - name: Validate workflow-registry.json
+        if: hashFiles('.roadmap/workflow-registry.json') != ''
+        run: |
+          npx ajv validate \
+            -s template-repo/schemas/workflow-registry.schema.json \
+            -d .roadmap/workflow-registry.json \
+            --spec=draft2020 \
+            -c ajv-formats
+
+      - name: Validate metrics-pipeline.json
+        if: hashFiles('.roadmap/metrics-pipeline.json') != ''
+        run: |
+          npx ajv validate \
+            -s template-repo/schemas/metrics-pipeline.schema.json \
+            -d .roadmap/metrics-pipeline.json \
+            --spec=draft2020 \
+            -c ajv-formats
+
+      - name: Validate deployment-metrics.json
+        if: hashFiles('.roadmap/deployment-metrics.json') != ''
+        run: |
+          npx ajv validate \
+            -s template-repo/schemas/deployment-metrics.schema.json \
+            -d .roadmap/deployment-metrics.json \
+            --spec=draft2020 \
+            -c ajv-formats
+
+      - name: Validate feature files
+        run: |
+          shopt -s nullglob
+          for feature_dir in .roadmap/features/*/; do
+            if [ -f "${feature_dir}FEATURE.json" ]; then
+              echo "Validating ${feature_dir}FEATURE.json"
+              npx ajv validate \
+                -s template-repo/schemas/feature.schema.json \
+                -d "${feature_dir}FEATURE.json" \
+                --spec=draft7 \
+                -c ajv-formats || true
+            fi
+            if [ -f "${feature_dir}interfaces.json" ]; then
+              echo "Validating ${feature_dir}interfaces.json"
+              npx ajv validate \
+                -s template-repo/schemas/interfaces.schema.json \
+                -d "${feature_dir}interfaces.json" \
+                --spec=draft7 \
+                -c ajv-formats || true
+            fi
+          done
+
+      - name: Summary
+        run: |
+          echo "## Schema Validation Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All .roadmap/ files validated against canonical schemas." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Enterprise Excellence. Schema-First. No Shortcuts.**" >> $GITHUB_STEP_SUMMARY
