@@ -1,329 +1,41 @@
 {
-  "$schema": "https://luhtech.dev/schemas/portfolio/workflow-registry-v1.json",
-  "schemaVersion": "1.0.0",
-  "meta": {
-    "lastUpdated": "2025-12-12T00:00:00Z",
-    "schemaFirst": true,
-    "sourceOfTruth": "luh-tech/business-tools",
-    "derivedFrom": "https://luhtech.dev/schemas/portfolio/workflow-registry-v1.json",
-    "maintainer": "LuhTech Enterprise Infrastructure",
-    "documentation": "https://github.com/luh-tech/luh-tech-roadmap-template/blob/main/schemas/README.md"
+  "$schema": "../schemas/workflow-registry.schema.json",
+  "version": "1.0.0",
+  "lastUpdated": "2026-01-27T00:00:00Z",
+  "metadata": {
+    "totalActive": 5,
+    "totalArchived": 0,
+    "slackEnabled": 3,
+    "enterprise": true
   },
-  "workflows": {
-    "validate-portfolio": {
-      "id": "validate-portfolio",
-      "description": "Full portfolio schema validation across all 8 ventures",
-      "tool": "roadmap-aggregator-v3",
-      "command": "python -m roadmap_aggregator validate",
-      "workingDirectory": "tools/roadmap-aggregator-v3",
-      "outputs": ["validation-report.json"],
-      "requires": [],
-      "dependencies": {
-        "secrets": ["GITHUB_TOKEN"]
-      },
-      "scope": "portfolio",
-      "estimatedDuration": "30s",
-      "retryable": true
-    },
-    "validate-venture": {
-      "id": "validate-venture",
-      "description": "Single venture roadmap validation",
-      "tool": "roadmap-aggregator-v3",
-      "command": "python -m roadmap_aggregator validate --venture {venture}",
-      "workingDirectory": "tools/roadmap-aggregator-v3",
-      "outputs": ["validation-report-{venture}.json"],
-      "requires": [],
-      "dependencies": {
-        "secrets": ["GITHUB_TOKEN"]
-      },
-      "scope": "venture",
-      "estimatedDuration": "10s",
-      "retryable": true
-    },
-    "aggregate-portfolio": {
-      "id": "aggregate-portfolio",
-      "description": "Generate consolidated portfolio.json from all ventures",
-      "tool": "roadmap-aggregator-v3",
-      "command": "python -m roadmap_aggregator aggregate --output portfolio-{date}.json",
-      "workingDirectory": "tools/roadmap-aggregator-v3",
-      "outputs": ["portfolio-{date}.json"],
-      "requires": ["validate-portfolio"],
-      "dependencies": {
-        "secrets": ["GITHUB_TOKEN"]
-      },
-      "scope": "portfolio",
-      "estimatedDuration": "1m",
-      "retryable": true
-    },
-    "detect-conflicts": {
-      "id": "detect-conflicts",
-      "description": "Resource allocation and dependency conflict detection",
-      "tool": "roadmap-aggregator-v3",
-      "command": "python -m roadmap_aggregator conflicts",
-      "workingDirectory": "tools/roadmap-aggregator-v3",
-      "outputs": ["conflicts-report.json"],
-      "requires": ["aggregate-portfolio"],
-      "dependencies": {},
-      "scope": "portfolio",
-      "estimatedDuration": "15s",
-      "retryable": true
-    },
-    "generate-slides": {
-      "id": "generate-slides",
-      "description": "Generate investor decks from roadmap data via Google Slides API",
-      "tool": "slide-generator",
-      "command": "poetry run python -m slide_generator generate --venture {venture} --deck-type {deckType}",
-      "workingDirectory": "tools/slide-generator",
-      "outputs": ["exports/{venture}_{deckType}_{date}/"],
-      "requires": ["aggregate-portfolio"],
-      "dependencies": {
-        "envVars": ["GOOGLE_APPLICATION_CREDENTIALS"],
-        "secrets": ["GOOGLE_SERVICE_ACCOUNT_KEY"],
-        "files": ["config/brands.json"]
-      },
-      "scope": "venture",
-      "estimatedDuration": "2m",
-      "retryable": true
-    },
-    "validate-brands": {
-      "id": "validate-brands",
-      "description": "Validate brand assets and Google Drive accessibility",
-      "tool": "slide-generator",
-      "command": "poetry run python scripts/validate_brand_assets.py --all --no-test",
-      "workingDirectory": "tools/slide-generator",
-      "outputs": ["brand-validation-report.json"],
-      "requires": [],
-      "dependencies": {
-        "envVars": ["GOOGLE_APPLICATION_CREDENTIALS"],
-        "files": ["config/brands.json"]
-      },
-      "scope": "portfolio",
-      "estimatedDuration": "1m",
-      "retryable": true
-    },
-    "analyze-gaps": {
-      "id": "analyze-gaps",
-      "description": "Content completeness analysis per venture per deck type",
-      "tool": "gap-analyzer",
-      "command": "python scripts/analyze_content_gaps.py --portfolio portfolio-{date}.json",
-      "workingDirectory": "tools/roadmap-aggregator-v3",
-      "outputs": ["gap-analysis-{date}.json"],
-      "requires": ["aggregate-portfolio"],
-      "dependencies": {
-        "files": ["portfolio-{date}.json"]
-      },
-      "scope": "portfolio",
-      "estimatedDuration": "30s",
-      "retryable": true
+  "namingConventions": {
+    "pattern": "category-action.yml (e.g., ci-test.yml, ops-deploy.yml)",
+    "prefixes": {
+      "ci": "Continuous Integration (build, test, lint)",
+      "cd": "Continuous Deployment (release, deploy)",
+      "ops": "Operations (metrics, monitoring, cleanup)",
+      "sync": "Data synchronization workflows",
+      "validate": "Validation and verification workflows"
     }
   },
-  "transformers": {
-    "cover": {
-      "id": "cover",
-      "description": "Title slide with venture name and tagline",
-      "requiredFields": ["meta.ventureName", "pitch.oneLiner"],
-      "optionalFields": ["meta.author", "meta.lastUpdated", "venture.type"],
-      "outputType": "slide",
-      "slideType": "cover"
-    },
-    "problem": {
-      "id": "problem",
-      "description": "Problem statement with 3-column pain points",
-      "requiredFields": ["pitch.problem"],
-      "optionalFields": ["pitch.problem.bullets", "pitch.problem.narrative"],
-      "outputType": "slide",
-      "slideType": "problem"
-    },
-    "solution": {
-      "id": "solution",
-      "description": "Solution overview with differentiators",
-      "requiredFields": ["pitch.solution"],
-      "optionalFields": ["pitch.differentiator", "pitch.solution.bullets"],
-      "outputType": "slide",
-      "slideType": "solution"
-    },
-    "market": {
-      "id": "market",
-      "description": "Market sizing (TAM/SAM/SOM) with CAGR",
-      "requiredFields": ["pitch.market"],
-      "optionalFields": [],
-      "outputType": "slide",
-      "slideType": "market",
-      "parsing": {
-        "tam": {
-          "type": "regex",
-          "pattern": "\\$([\\d.]+[BMK])",
-          "groups": ["value"]
-        },
-        "sam": {
-          "type": "regex",
-          "pattern": "\\$([\\d.]+[BMK])",
-          "groups": ["value"]
-        },
-        "som": {
-          "type": "regex",
-          "pattern": "\\$([\\d.]+[BMK])",
-          "groups": ["value"]
-        },
-        "cagr": {
-          "type": "regex",
-          "pattern": "(\\d+)%\\s*CAGR",
-          "groups": ["percentage"]
-        }
-      }
-    },
-    "business_model": {
-      "id": "business_model",
-      "description": "Revenue streams and pricing model",
-      "requiredFields": ["pitch.businessModel"],
-      "optionalFields": ["financials.projections", "pitch.businessModel.pricing"],
-      "outputType": "slide",
-      "slideType": "business_model"
-    },
-    "traction": {
-      "id": "traction",
-      "description": "Platform progress and key metrics",
-      "requiredFields": ["venture.platformProgress"],
-      "optionalFields": ["quarters", "keyMilestones"],
-      "outputType": "slide",
-      "slideType": "traction"
-    },
-    "team": {
-      "id": "team",
-      "description": "Team structure and key hires",
-      "requiredFields": ["team.current"],
-      "optionalFields": ["team.keyHires", "team.advisors"],
-      "outputType": "slide",
-      "slideType": "team"
-    },
-    "ask": {
-      "id": "ask",
-      "description": "Investment ask and use of funds",
-      "requiredFields": ["financials.preSeed"],
-      "optionalFields": ["financials.preSeedUse", "financials.seed"],
-      "outputType": "slide",
-      "slideType": "ask"
-    },
-    "timeline": {
-      "id": "timeline",
-      "description": "Roadmap phases across quarters",
-      "requiredFields": ["quarters"],
-      "optionalFields": ["keyMilestones"],
-      "outputType": "slide",
-      "slideType": "timeline"
-    },
-    "technology": {
-      "id": "technology",
-      "description": "Technical architecture and moats",
-      "requiredFields": ["venture.architecture"],
-      "optionalFields": ["competitive.moats", "techStack"],
-      "outputType": "slide",
-      "slideType": "technology"
-    },
-    "validation": {
-      "id": "validation",
-      "description": "Proof points and customer validation",
-      "requiredFields": ["venture.platformProgress", "keyMilestones"],
-      "optionalFields": ["pilot", "letters_of_intent"],
-      "outputType": "slide",
-      "slideType": "validation"
-    }
+  "categories": {
+    "ci": {"description": "Continuous Integration workflows for build and test", "purpose": "Ensure code quality and prevent regressions", "sla": "< 10 minutes"},
+    "cd": {"description": "Continuous Deployment workflows", "purpose": "Automate production deployments", "sla": "< 15 minutes"},
+    "ops": {"description": "Operational workflows for monitoring and maintenance", "purpose": "System health and observability", "sla": "< 5 minutes"},
+    "sync": {"description": "Data synchronization workflows", "purpose": "Keep systems in sync", "sla": "< 30 minutes"},
+    "validate": {"description": "Validation workflows", "purpose": "Verify data integrity and schema compliance", "sla": "< 5 minutes"}
   },
-  "deckTypes": {
-    "investor": {
-      "id": "investor",
-      "name": "Investor Deck",
-      "description": "Full pitch deck for pre-seed/seed investors",
-      "slides": ["cover", "problem", "solution", "market", "business_model", "traction", "team", "ask", "timeline"],
-      "requiredCompleteness": 0.8,
-      "audience": "investor",
-      "slideCount": {
-        "min": 8,
-        "max": 12,
-        "target": 10
-      }
-    },
-    "partner": {
-      "id": "partner",
-      "name": "Partner Deck",
-      "description": "Technical partnership pitch emphasizing architecture and timeline",
-      "slides": ["cover", "solution", "technology", "timeline", "team"],
-      "requiredCompleteness": 0.9,
-      "audience": "partner",
-      "slideCount": {
-        "min": 5,
-        "max": 8,
-        "target": 6
-      }
-    },
-    "internal": {
-      "id": "internal",
-      "name": "Internal Deck",
-      "description": "Team-facing progress and roadmap update",
-      "slides": ["cover", "traction", "timeline", "technology"],
-      "requiredCompleteness": 0.7,
-      "audience": "internal",
-      "slideCount": {
-        "min": 4,
-        "max": 6,
-        "target": 5
-      }
-    },
-    "customer": {
-      "id": "customer",
-      "name": "Customer Deck",
-      "description": "Customer-facing pitch emphasizing problem/solution fit",
-      "slides": ["cover", "problem", "solution", "validation"],
-      "requiredCompleteness": 0.85,
-      "audience": "customer",
-      "slideCount": {
-        "min": 4,
-        "max": 6,
-        "target": 5
-      }
-    },
-    "accelerator": {
-      "id": "accelerator",
-      "name": "Accelerator Deck",
-      "description": "Accelerator application pitch deck",
-      "slides": ["cover", "problem", "solution", "market", "traction", "team", "ask"],
-      "requiredCompleteness": 0.75,
-      "audience": "accelerator",
-      "slideCount": {
-        "min": 6,
-        "max": 10,
-        "target": 8
-      }
-    }
-  },
-  "pipelineStages": [
-    {
-      "id": "stage-1",
-      "name": "Validation",
-      "description": "Validate all venture roadmaps against schema v2.0.0",
-      "workflows": ["validate-portfolio"],
-      "parallel": false
-    },
-    {
-      "id": "stage-2",
-      "name": "Aggregation",
-      "description": "Consolidate all roadmap data into portfolio.json",
-      "workflows": ["aggregate-portfolio"],
-      "parallel": false
-    },
-    {
-      "id": "stage-3",
-      "name": "Analysis",
-      "description": "Analyze content gaps and detect conflicts",
-      "workflows": ["analyze-gaps", "detect-conflicts"],
-      "parallel": true
-    },
-    {
-      "id": "stage-4",
-      "name": "Generation",
-      "description": "Generate slide decks via Google Slides API",
-      "workflows": ["generate-slides"],
-      "parallel": false
-    }
-  ]
+  "workflows": [
+    {"file": "ci-test.yml", "name": "CI Tests", "category": "ci", "purpose": "Run unit and integration tests on all PRs and pushes", "triggers": ["push", "pull_request"], "pathFilters": ["src/**", "tests/**"], "slack": true, "timeout": "10 minutes", "status": "active", "failureMode": "fail", "expectedOutcome": "All tests pass with >80% coverage"},
+    {"file": "ci-lint.yml", "name": "CI Lint", "category": "ci", "purpose": "Check code style and static analysis", "triggers": ["push", "pull_request"], "pathFilters": ["src/**"], "slack": false, "timeout": "5 minutes", "status": "active", "failureMode": "fail", "expectedOutcome": "No linting errors"},
+    {"file": "ops-metrics.yml", "name": "Metrics Collection", "category": "ops", "purpose": "Collect and report system metrics", "triggers": ["schedule", "workflow_dispatch"], "schedule": "0 */6 * * *", "slack": true, "timeout": "5 minutes", "status": "active", "failureMode": "warn", "skipConditions": ["Metrics service unavailable"], "externalDependencies": ["prometheus", "grafana"], "expectedOutcome": "Metrics collected and reported", "metricsConfig": {"pipelineRef": "metrics-pipeline.json", "collectsFrom": ["prometheus", "github-api"], "reportsTo": ["github-step-summary", "slack"]}},
+    {"file": "validate-schemas.yml", "name": "Schema Validation", "category": "validate", "purpose": "Validate all JSON files against their schemas", "triggers": ["push", "pull_request"], "pathFilters": [".roadmap/**/*.json", "schemas/**"], "slack": false, "timeout": "3 minutes", "status": "active", "failureMode": "fail", "expectedOutcome": "All JSON files pass schema validation"},
+    {"file": "sync-notion.yml", "name": "Notion Sync", "category": "sync", "purpose": "Synchronize roadmap data to Notion dashboards", "triggers": ["workflow_dispatch", "schedule"], "schedule": "0 8 * * *", "slack": true, "timeout": "15 minutes", "status": "active", "failureMode": "warn", "skipConditions": ["Notion API rate limited", "No changes detected"], "externalDependencies": ["notion-api"], "expectedOutcome": "Dashboard reflects latest roadmap data"}
+  ],
+  "normalizationRules": {
+    "greenMeansSuccess": "All checks passed, no issues detected",
+    "yellowMeansWarning": "Completed with non-critical warnings or skipped optional steps",
+    "redMeansFailure": "Critical failure requiring attention",
+    "skipBehavior": "Show as green with skip indicator when conditions met"
+  }
 }
