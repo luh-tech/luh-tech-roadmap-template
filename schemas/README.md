@@ -1,8 +1,8 @@
 # LuhTech Infrastructure Documentation Schema System
 
-**Version:** 1.3.0  
-**Status:** Phase 1 Complete + Portfolio Workflows + Extensions + URN/Graph System  
-**Date:** 2026-01-06  
+**Version:** 1.5.0  
+**Status:** Phase 3 Complete - Template Architecture Migration  
+**Date:** 2026-01-28  
 **Principle:** No Shortcuts, Enterprise Excellence Always
 
 ---
@@ -17,11 +17,15 @@ This schema system provides standardized infrastructure documentation for the Lu
 - **Schema-First Architecture** - Generated models, CI enforcement, no drift
 - **Cross-Repo Workflow Discovery** - Portfolio workflows referenced by $ref
 - **Venture Extensions** - Explicit sharing control for venture-specific data
-- **URN Identifiers & Graph System** - Cross-venture entity linking and graph queries (NEW)
+- **URN Identifiers & Graph System** - Cross-venture entity linking and graph queries
+- **Feature Tracking** - Milestone-based development with ROI tracking (NEW)
+- **Observability Pipeline** - Multi-destination metrics with failure handling (NEW)
 
 ---
 
 ## Schema Inventory
+
+### Core Venture-Level Schemas
 
 | Schema | Version | Size | Purpose |
 |--------|---------|------|---------|
@@ -37,6 +41,17 @@ This schema system provides standardized infrastructure documentation for the Lu
 | `evidence-session.schema.json` | v1.0.0 | ~12KB | Investigation tracking, evidence nodes, retention policies |
 | `extensions.schema.v1.json` | v1.0.0 | ~2KB | Venture-specific extensions with share control |
 
+### Newly Promoted Schemas (v1.5.0)
+
+| Schema | Version | Size | Purpose |
+|--------|---------|------|---------|
+| `feature.schema.json` | v1.0.0 | ~10KB | **NEW** - Feature specifications with milestones, deliverables, ROI tracking |
+| `interfaces.schema.json` | v1.0.0 | ~9KB | **NEW** - MCP tools, REST APIs, GraphQL resolvers, middleware specs |
+| `workflow-registry.schema.json` | v1.0.0 | ~7KB | **NEW** - GitHub Actions workflow documentation and categorization |
+| `metrics-pipeline.schema.json` | v1.0.0 | ~9KB | **NEW** - Metrics collection, failure handling, multi-destination reporting |
+| `deployment-metrics.schema.json` | v1.0.0 | ~5KB | **NEW** - Watchtower deployment tracking per environment |
+| `roadmap-business.schema.json` | v1.0.0 | ~9KB | **NEW** - Business roadmap: financials, team, competitive positioning |
+
 ### Portfolio-Level Schemas
 
 | Schema | Version | Size | Purpose |
@@ -46,19 +61,249 @@ This schema system provides standardized infrastructure documentation for the Lu
 | `portfolio/portfolio.schema.json` | v1.0.0 | ~16KB | Aggregated portfolio view |
 | `portfolio/ip-assets.schema.json` | v1.0.0 | ~10KB | Intellectual property tracking |
 | `portfolio/extensions-matrix.schema.v1.json` | v1.0.0 | ~2KB | Portfolio-level extension aggregation |
-| `portfolio/portfolio-graph.schema.v1.json` | v1.0.0 | ~5KB | **NEW**: Portfolio-wide graph structure |
+| `portfolio/portfolio-graph.schema.v1.json` | v1.0.0 | ~5KB | Portfolio-wide graph structure |
 
 ### Shared Building Blocks
 
 | Schema | Version | Purpose |
-|--------|---------|---------|
+|--------|---------|------------|
 | `_enums/luhtech-enums.schema.v2.json` | v2.0.0 | Shared enumerations (ventureId, status, etc.) |
 | `_definitions/definitions.schema.json` | v1.1.0 | Shared type definitions + URN/graph refs |
-| `_definitions/graph.schema.json` | v1.0.0 | **NEW**: URN identifiers and graph metadata |
+| `_definitions/graph.schema.json` | v1.0.0 | URN identifiers and graph metadata |
 
 ---
 
-## URN Identifier System (NEW in v1.3.0)
+## New Schema Details (v1.5.0)
+
+### feature.schema.json
+
+Feature specifications with milestones, deliverables, and business value tracking.
+
+- **JSON Schema Draft:** Draft-07
+- **Use Cases:** Feature planning, milestone tracking, ROI estimation, pilot deployments
+- **Template:** `templates/feature.json`
+- **Key Features:**
+  - Milestone tracking with completion criteria
+  - Business value metrics (ROI, savings, incidents avoided)
+  - Dependency management (schemas, services, features, external)
+  - Graph metadata for AI navigation
+  - Scenario-based ROI estimation
+
+**Example Structure:**
+```json
+{
+  "$schema": "https://luhtech.dev/schemas/feature.schema.json",
+  "$id": "urn:luhtech:ectropy:feature:decision-lifecycle",
+  "featureId": "decision-lifecycle",
+  "name": "Decision Lifecycle",
+  "status": "PRODUCTION",
+  "priority": "CRITICAL",
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "Schema Migration",
+      "status": "COMPLETE",
+      "deliverables": [".roadmap/schemas/decision.schema.json"]
+    }
+  ]
+}
+```
+
+### interfaces.schema.json
+
+MCP tool signatures, REST API endpoints, GraphQL resolvers, and middleware specifications.
+
+- **JSON Schema Draft:** Draft-07
+- **Use Cases:** API documentation, MCP tool definitions, event specifications
+- **Template:** `templates/interfaces.json`
+- **Key Features:**
+  - MCP tool definitions with categories and parameters
+  - REST API endpoint documentation
+  - GraphQL resolver specifications
+  - Middleware pipeline definitions
+  - Event system documentation
+
+**Example Structure:**
+```json
+{
+  "$schema": "https://luhtech.dev/schemas/interfaces.schema.json",
+  "mcpTools": {
+    "totalCount": 39,
+    "categories": [
+      {
+        "name": "decision-tools",
+        "tools": [
+          {
+            "id": "create_decision",
+            "description": "Create a new architectural decision record"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### workflow-registry.schema.json
+
+GitHub Actions workflow documentation and categorization following enterprise patterns.
+
+- **JSON Schema Draft:** Draft-2020-12
+- **Use Cases:** CI/CD documentation, workflow categorization, failure mode tracking
+- **Template:** `templates/workflow-registry.json`
+- **Key Features:**
+  - Workflow categorization (ci, cd, validation, sync, monitoring)
+  - Trigger documentation (push, pull_request, schedule, workflow_dispatch)
+  - Dependency tracking between workflows
+  - Failure mode documentation
+  - Self-documenting with `meta.schemaFirst: true`
+
+**Example Structure:**
+```json
+{
+  "$schema": "https://luhtech.dev/schemas/workflow-registry.schema.json",
+  "meta": {
+    "schemaFirst": true,
+    "version": "1.0.0"
+  },
+  "workflows": [
+    {
+      "id": "validate-roadmap",
+      "name": "Validate Roadmap",
+      "category": "validation",
+      "path": ".github/workflows/validate-roadmap.yml"
+    }
+  ]
+}
+```
+
+### metrics-pipeline.schema.json
+
+Robust metrics collection with failure handling and multi-destination reporting.
+
+- **JSON Schema Draft:** Draft-2020-12
+- **Use Cases:** Observability configuration, metrics routing, failure recovery
+- **Template:** `templates/metrics-pipeline.json`
+- **Key Features:**
+  - Multiple metric sources (github, notion, slides, health, custom)
+  - Multiple destinations (notion, github-issues, slack, webhook)
+  - Failure handling matrix with retry strategies
+  - Scheduling with cron expressions
+  - Metric transformations
+
+**Example Structure:**
+```json
+{
+  "$schema": "https://luhtech.dev/schemas/metrics-pipeline.schema.json",
+  "sources": [
+    {
+      "id": "github-ci",
+      "type": "github",
+      "config": {
+        "repository": "luh-tech/business-tools",
+        "metrics": ["test-coverage", "build-status"]
+      }
+    }
+  ],
+  "destinations": [
+    {
+      "id": "notion-dashboard",
+      "type": "notion",
+      "config": {
+        "pageId": "abc123"
+      }
+    }
+  ]
+}
+```
+
+### deployment-metrics.schema.json
+
+Watchtower auto-deployment tracking with per-environment service status.
+
+- **JSON Schema Draft:** Draft-2020-12
+- **Use Cases:** Deployment monitoring, service health tracking, success rate analysis
+- **Template:** `templates/deployment-metrics.json`
+- **Key Features:**
+  - Per-environment tracking (staging, production)
+  - Service-level deployment status
+  - Watchtower integration metrics
+  - Historical deployment tracking
+  - Success/failure rate calculations
+
+**Example Structure:**
+```json
+{
+  "$schema": "https://luhtech.dev/schemas/deployment-metrics.schema.json",
+  "environments": {
+    "production": {
+      "services": [
+        {
+          "name": "mcp-server",
+          "currentVersion": "1.2.0",
+          "lastDeployment": "2026-01-28T00:00:00Z",
+          "status": "healthy"
+        }
+      ]
+    }
+  }
+}
+```
+
+### roadmap-business.schema.json
+
+Business roadmap data including financials, team planning, and competitive positioning.
+
+- **JSON Schema Draft:** Draft-07
+- **Use Cases:** Investor materials, business planning, service tier definitions
+- **Template:** `templates/roadmap-business.json`
+- **Key Features:**
+  - Financial projections (revenue, runway, burn rate)
+  - Team growth planning
+  - Competitive analysis
+  - Service tier definitions
+  - Market positioning
+
+**Example Structure:**
+```json
+{
+  "$schema": "https://luhtech.dev/schemas/roadmap-business.schema.json",
+  "financials": {
+    "currentMRR": 0,
+    "projectedARR": 500000,
+    "runway": "18 months"
+  },
+  "team": {
+    "current": 1,
+    "planned": 5,
+    "keyHires": ["CTO", "Sales Lead"]
+  },
+  "serviceTiers": [
+    {
+      "name": "Starter",
+      "price": 499,
+      "features": ["Core analytics", "5 users"]
+    }
+  ]
+}
+```
+
+---
+
+## Schema Adoption Checklist
+
+For each venture adopting the new schemas:
+
+- [ ] Copy schema to `.roadmap/schemas/` (or reference from template repo)
+- [ ] Create initial JSON file from template in `.roadmap/`
+- [ ] Update `$id` URN with venture name
+- [ ] Populate venture-specific data
+- [ ] Add validation to CI workflow
+- [ ] Document in venture's README
+
+---
+
+## URN Identifier System
 
 ### Purpose
 
@@ -97,6 +342,9 @@ urn:luhtech:holdings:venture:ectropy
 | `task` | Deliverable/task |
 | `metric` | Business metric |
 | `extension` | Venture extension |
+| `feature` | Feature specification (NEW) |
+| `interface` | API/MCP interface (NEW) |
+| `workflow` | CI/CD workflow (NEW) |
 
 ### Edge Types
 
@@ -114,82 +362,6 @@ urn:luhtech:holdings:venture:ectropy
 | `owns` | Ownership relationship |
 | `implements` | Implementation relationship |
 | `relates-to` | General relationship |
-
-### Graph Metadata Block
-
-Every entity can include bidirectional graph traversal metadata:
-
-```json
-{
-  "$id": "urn:luhtech:ectropy:decision:d-2026-01-01-example",
-  "graphMetadata": {
-    "inEdges": [
-      "urn:luhtech:ectropy:decision:d-2025-12-parent-decision"
-    ],
-    "outEdges": [
-      "urn:luhtech:ectropy:service:service-affected"
-    ]
-  }
-}
-```
-
-### Using URNs in Schemas
-
-Reference URN and graph definitions in your schemas:
-
-```json
-{
-  "properties": {
-    "$id": {
-      "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/urn",
-      "description": "URN identifier for this entity"
-    },
-    "graphMetadata": {
-      "$ref": "https://luhtech.dev/schemas/graph.json#/definitions/graphMetadata",
-      "description": "Graph traversal metadata"
-    }
-  }
-}
-```
-
-### Portfolio Graph
-
-The `portfolio-graph.schema.v1.json` enables Holdings-level graph aggregation:
-
-```json
-{
-  "$schema": "https://luhtech.dev/schemas/portfolio-graph.v1.json",
-  "meta": {
-    "version": "1.0.0",
-    "lastUpdated": "2026-01-06T20:00:00Z",
-    "totalNodes": 127,
-    "totalEdges": 89,
-    "ventures": ["ectropy", "jobsitecontrol", "qullqa"]
-  },
-  "nodes": [...],
-  "edges": [...],
-  "indexes": {
-    "byType": {
-      "venture": ["urn:luhtech:holdings:venture:ectropy", ...],
-      "service": ["urn:luhtech:ectropy:service:mcp-server", ...]
-    },
-    "byVenture": {
-      "ectropy": ["urn:luhtech:ectropy:file:roadmap", ...],
-      "jobsitecontrol": [...]
-    }
-  },
-  "crossVentureRelationships": [
-    {
-      "from": "urn:luhtech:jobsitecontrol:venture:jobsitecontrol",
-      "to": "urn:luhtech:ectropy:venture:ectropy",
-      "type": "fork",
-      "sourceVenture": "jobsitecontrol",
-      "targetVenture": "ectropy",
-      "weight": 0.85
-    }
-  ]
-}
-```
 
 ---
 
@@ -210,7 +382,13 @@ luh-tech/luh-tech-roadmap-template/schemas/
 │   ├── infrastructure-catalog.schema.json
 │   ├── tech-stack.schema.json
 │   ├── evidence-session.schema.json
-│   └── extensions.schema.v1.json
+│   ├── extensions.schema.v1.json
+│   ├── feature.schema.json              ← NEW (v1.5.0)
+│   ├── interfaces.schema.json           ← NEW (v1.5.0)
+│   ├── workflow-registry.schema.json    ← NEW (v1.5.0)
+│   ├── metrics-pipeline.schema.json     ← NEW (v1.5.0)
+│   ├── deployment-metrics.schema.json   ← NEW (v1.5.0)
+│   └── roadmap-business.schema.json     ← NEW (v1.5.0)
 │
 ├── PORTFOLIO-LEVEL (Cross-venture operations)
 │   ├── portfolio/workflow-registry.schema.json
@@ -218,15 +396,15 @@ luh-tech/luh-tech-roadmap-template/schemas/
 │   ├── portfolio/portfolio.schema.json
 │   ├── portfolio/ip-assets.schema.json
 │   ├── portfolio/extensions-matrix.schema.v1.json
-│   └── portfolio/portfolio-graph.schema.v1.json    ← NEW
+│   └── portfolio/portfolio-graph.schema.v1.json
 │
 ├── _enums/
 │   ├── luhtech-enums.schema.json
 │   └── luhtech-enums.schema.v2.json
 │
 └── _definitions/
-    ├── definitions.schema.json                      ← Updated with URN refs
-    └── graph.schema.json                            ← NEW
+    ├── definitions.schema.json
+    └── graph.schema.json
 ```
 
 ---
@@ -243,6 +421,14 @@ luh-tech/luh-tech-roadmap-template/schemas/
 ├── infrastructure-catalog.json     ← Service registry
 ├── tech-stack.json                 ← Technology documentation
 ├── extensions.json                 ← Venture-specific extensions
+├── roadmap-business.json           ← Business roadmap (NEW)
+├── workflow-registry.json          ← CI/CD documentation (NEW)
+├── metrics-pipeline.json           ← Observability config (NEW)
+├── deployment-metrics.json         ← Deployment tracking (NEW)
+├── features/                       ← Feature specifications (NEW)
+│   └── {feature-id}/
+│       ├── FEATURE.json            ← Feature spec
+│       └── interfaces.json         ← API definitions
 └── evidence/                       ← Evidence sessions directory
     └── ...
 ```
@@ -254,54 +440,8 @@ LuhTech-business/.roadmap/
 ├── portfolio.json                  ← Aggregated portfolio view
 ├── ip-assets.json                  ← IP tracking
 ├── extensions-matrix.json          ← Shared extensions from all ventures
-└── portfolio-graph.json            ← Portfolio-wide graph (NEW)
+└── portfolio-graph.json            ← Portfolio-wide graph
 ```
-
----
-
-## Extensions System
-
-### Purpose
-
-Ventures can define custom data extensions while controlling what is shared with Holdings.
-
-### Venture extensions.json
-
-```json
-{
-  "$schema": "https://luhtech.dev/schemas/extensions-v1.json",
-  "ventureId": "ectropy",
-  "lastUpdated": "2026-01-06T20:00:00Z",
-  "extensions": {
-    "mcp": {
-      "share": true,
-      "description": "MCP server and tool integration metrics",
-      "version": "1.0.0",
-      "data": {
-        "serverCount": 4,
-        "toolCount": 47
-      }
-    },
-    "internal": {
-      "share": false,
-      "description": "Internal dev notes - not shared",
-      "version": "1.0.0",
-      "data": {
-        "blockers": ["Repository split pending"]
-      }
-    }
-  }
-}
-```
-
-### Key Fields
-
-| Field | Required | Purpose |
-|-------|----------|---------|
-| `share` | ✅ | `true` = visible to Holdings, `false` = private |
-| `description` | Optional | Human-readable description |
-| `version` | Optional | Extension version (semver) |
-| `data` | ✅ | Extension payload (any valid JSON) |
 
 ---
 
@@ -314,21 +454,19 @@ Add to `.github/workflows/roadmap-ci.yml`:
 ```yaml
 - name: Validate Roadmap Files
   run: |
-    # Validate core files
-    npx ajv validate -s schemas/roadmap.schema.v2.json -d .roadmap/roadmap.json
+    # Install ajv-cli
+    npm install -g ajv-cli ajv-formats
     
-    # Validate extensions if present
-    if [ -f ".roadmap/extensions.json" ]; then
-      npx ajv validate \
-        -s schemas/extensions.schema.v1.json \
-        -d .roadmap/extensions.json
-    fi
-
-- name: Validate URN Format
-  run: |
-    # Check all $id fields match URN pattern
-    grep -r '"$id"' .roadmap/*.json | \
-      grep -v 'urn:luhtech:' && echo "ERROR: Non-URN $id found" && exit 1 || true
+    # Validate core files
+    npx ajv validate -s schemas/roadmap.schema.v2.json -d .roadmap/roadmap.json --spec=draft7 -c ajv-formats
+    
+    # Validate new schemas (v1.5.0)
+    npx ajv validate -s schemas/feature.schema.json -d .roadmap/features/*/FEATURE.json --spec=draft7 -c ajv-formats
+    npx ajv validate -s schemas/interfaces.schema.json -d .roadmap/features/*/interfaces.json --spec=draft7 -c ajv-formats
+    npx ajv validate -s schemas/workflow-registry.schema.json -d .roadmap/workflow-registry.json --spec=draft2020 -c ajv-formats
+    npx ajv validate -s schemas/metrics-pipeline.schema.json -d .roadmap/metrics-pipeline.json --spec=draft2020 -c ajv-formats
+    npx ajv validate -s schemas/deployment-metrics.schema.json -d .roadmap/deployment-metrics.json --spec=draft2020 -c ajv-formats
+    npx ajv validate -s schemas/roadmap-business.schema.json -d .roadmap/roadmap-business.json --spec=draft7 -c ajv-formats
 ```
 
 ### Local Validation
@@ -337,16 +475,67 @@ Add to `.github/workflows/roadmap-ci.yml`:
 # Install ajv-cli
 npm install -g ajv-cli ajv-formats
 
-# Validate extensions
-ajv validate -s schemas/extensions.schema.v1.json -d .roadmap/extensions.json
+# Validate feature specification
+npx ajv validate -s schemas/feature.schema.json -d .roadmap/features/decision-lifecycle/FEATURE.json --spec=draft7 -c ajv-formats
 
-# Validate graph
-ajv validate -s schemas/portfolio/portfolio-graph.schema.v1.json -d .roadmap/portfolio-graph.json
+# Validate interfaces
+npx ajv validate -s schemas/interfaces.schema.json -d .roadmap/features/decision-lifecycle/interfaces.json --spec=draft7 -c ajv-formats
+
+# Validate workflow registry
+npx ajv validate -s schemas/workflow-registry.schema.json -d .roadmap/workflow-registry.json --spec=draft2020 -c ajv-formats
+
+# Validate metrics pipeline
+npx ajv validate -s schemas/metrics-pipeline.schema.json -d .roadmap/metrics-pipeline.json --spec=draft2020 -c ajv-formats
+
+# Validate deployment metrics
+npx ajv validate -s schemas/deployment-metrics.schema.json -d .roadmap/deployment-metrics.json --spec=draft2020 -c ajv-formats
+
+# Validate business roadmap
+npx ajv validate -s schemas/roadmap-business.schema.json -d .roadmap/roadmap-business.json --spec=draft7 -c ajv-formats
 ```
 
 ---
 
 ## Changelog
+
+### v1.5.0 (2026-01-28)
+- **NEW**: `feature.schema.json` v1.0.0
+  - Feature specifications with milestones and deliverables
+  - Business value tracking (ROI, savings, incidents avoided)
+  - Scenario-based ROI estimation
+  - Graph metadata for AI navigation
+  - Template: `templates/feature.json`
+- **NEW**: `interfaces.schema.json` v1.0.0
+  - MCP tool definitions with categories
+  - REST API endpoint documentation
+  - GraphQL resolver specifications
+  - Event system documentation
+  - Template: `templates/interfaces.json`
+- **NEW**: `workflow-registry.schema.json` v1.0.0
+  - GitHub Actions workflow documentation
+  - Workflow categorization (ci, cd, validation, sync, monitoring)
+  - Dependency tracking between workflows
+  - Failure mode documentation
+  - Template: `templates/workflow-registry.json`
+- **NEW**: `metrics-pipeline.schema.json` v1.0.0
+  - Multi-source metrics collection
+  - Multi-destination reporting
+  - Failure handling matrix with retry strategies
+  - Template: `templates/metrics-pipeline.json`
+- **NEW**: `deployment-metrics.schema.json` v1.0.0
+  - Per-environment deployment tracking
+  - Watchtower integration metrics
+  - Service health monitoring
+  - Template: `templates/deployment-metrics.json`
+- **NEW**: `roadmap-business.schema.json` v1.0.0
+  - Financial projections
+  - Team growth planning
+  - Competitive analysis
+  - Service tier definitions
+  - Template: `templates/roadmap-business.json`
+- All 6 schemas promoted from luhtech/Ectropy flagship venture
+- All schemas generalized for portfolio-wide use
+- All templates validated against schemas
 
 ### v1.4.0 (2026-01-14)
 - **NEW**: `roadmap.schema.v2.2.json` v2.2.0
@@ -402,8 +591,14 @@ ajv validate -s schemas/portfolio/portfolio-graph.schema.v1.json -d .roadmap/por
 ✅ Cross-repo reference pattern ($ref)  
 ✅ Self-documenting (meta.schemaFirst)  
 ✅ Extension system with explicit sharing  
-✅ URN identifiers for entity linking (NEW)  
-✅ Bidirectional graph traversal (NEW)  
-✅ Portfolio-wide graph queries (NEW)  
+✅ URN identifiers for entity linking  
+✅ Bidirectional graph traversal  
+✅ Portfolio-wide graph queries  
+✅ Feature specifications with ROI tracking (NEW)  
+✅ MCP/API interface documentation (NEW)  
+✅ CI/CD workflow registry (NEW)  
+✅ Metrics pipeline configuration (NEW)  
+✅ Deployment tracking (NEW)  
+✅ Business roadmap separation (NEW)  
 
 **No shortcuts. Enterprise excellence always.**
